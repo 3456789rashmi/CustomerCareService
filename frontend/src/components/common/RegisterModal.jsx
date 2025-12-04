@@ -1,3 +1,4 @@
+// src/components/common/RegisterModal.jsx
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser, clearError } from '../../redux/slices/authSlice';
@@ -36,7 +37,7 @@ export default function RegisterModal({ isOpen, onClose }) {
           validationSchema={validation}
           onSubmit={async (values) => {
             const res = await dispatch(registerUser(values));
-            if (res.type === 'auth/registerUser/fulfilled') {
+            if (res.type && res.type.endsWith('/fulfilled')) {
               toast.success('Registered successfully');
               onClose();
             }

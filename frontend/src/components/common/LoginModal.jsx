@@ -1,3 +1,4 @@
+// src/components/common/LoginModal.jsx
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearError } from '../../redux/slices/authSlice';
@@ -34,7 +35,7 @@ export default function LoginModal({ isOpen, onClose }) {
           validationSchema={validation}
           onSubmit={async (values) => {
             const res = await dispatch(loginUser(values));
-            if (res.type === 'auth/loginUser/fulfilled') {
+            if (res.type && res.type.endsWith('/fulfilled')) {
               toast.success('Login successful');
               onClose();
             }

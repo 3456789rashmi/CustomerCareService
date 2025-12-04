@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import LoginModal from './LoginModal.jsx';
+import RegisterModal from './RegisterModal.jsx';
 import { useSelector, useDispatch } from 'react-redux';
-import LoginModal from './LoginModal';
-import RegisterModal from './RegisterModal';
 import { logout } from '../../redux/slices/authSlice';
 
 export default function Navbar() {
@@ -14,23 +13,11 @@ export default function Navbar() {
   return (
     <>
       <nav className="flex items-center justify-between px-6 py-4 shadow">
-        <Link to="/" className="text-xl font-bold">Packers & Movers</Link>
-
+        <div className="text-xl font-bold">Packers & Movers</div>
         <div className="space-x-4 flex items-center">
-          <Link to="/services">Services</Link>
-          <Link to="/contact">Contact</Link>
-
-          {user ? (
-            <>
-              <Link to="/dashboard" className="px-3 py-1 rounded bg-gray-100">{user.name?.split(' ')[0]}</Link>
-              <button className="text-sm" onClick={() => dispatch(logout())}>Logout</button>
-            </>
-          ) : (
-            <>
-              <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={() => setLoginOpen(true)}>Login</button>
-              <button className="px-3 py-1 rounded border" onClick={() => setRegisterOpen(true)}>Register</button>
-            </>
-          )}
+          <button onClick={() => setLoginOpen(true)} className="px-3 py-1 rounded bg-blue-600 text-white">Login</button>
+          <button onClick={() => setRegisterOpen(true)} className="px-3 py-1 rounded border">Register</button>
+          {user && <button onClick={() => dispatch(logout())}>Logout</button>}
         </div>
       </nav>
 

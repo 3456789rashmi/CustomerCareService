@@ -1,71 +1,62 @@
-// src/components/common/LoginModal.jsx
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, clearError } from '../../redux/slices/authSlice';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+﻿import React from 'react';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../redux/slices/authSlice';
 import { toast } from 'react-toastify';
 
 export default function LoginModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector(s => s.auth);
-
-  React.useEffect(() => {
-    if (error) {
-      toast.error(error);
-      dispatch(clearError());
-    }
-  }, [error, dispatch]);
-
   if (!isOpen) return null;
 
-  const initialValues = { email: '', password: '' };
-  const validation = Yup.object({
-    email: Yup.string().email('Invalid email').required('Required'),
-    password: Yup.string().min(6,'Min 6 chars').required('Required')
+  const formik = useFormik({
+    initialValues: { email: '', password: '' },
+    validationSchema: Yup.object({
+      email: Yup.string().email('Invalid Email').required('Required'),
+      password: Yup.string().required('Required'),
+    }),
+    onSubmit: async (values) => {
+      const res = await dispatch(loginUser(values));
+      if (res.meta.requestStatus === 'fulfilled') {
+        toast.success('Logged in');
+        onClose();
+      } else {
+        toast.error(res.payload || 'Login failed');
+      }
+    },
   });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
-        <h3 className="text-xl font-semibold mb-4">Login</h3>
+    <div className='fixed inset-0 bg-black/40 flex items-center justify-center z-50'>
+      <div className='bg-white w-96 rounded-lg p-6 shadow'>
+        <h2 className='text-xl font-semibold mb-4'>Login</h2>
 
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validation}
-          onSubmit={async (values) => {
-            const res = await dispatch(loginUser(values));
-            if (res.type && res.type.endsWith('/fulfilled')) {
-              toast.success('Login successful');
-              onClose();
-            }
-          }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <label className="block mb-2">Email</label>
-              <Field name="email" type="email" className="w-full p-2 border rounded" />
-              <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
+        <form onSubmit={formik.handleSubmit} className='space-y-4'>
+          <input
+            name='email'
+            type='email'
+            placeholder='Email'
+            className='w-full border p-2 rounded'
+            onChange={formik.handleChange}
+            value={formik.values.email}
+          />
+          <input
+            name='password'
+            type='password'
+            placeholder='Password'
+            className='w-full border p-2 rounded'
+            onChange={formik.handleChange}
+            value={formik.values.password}
+          />
 
-              <label className="block mt-4 mb-2">Password</label>
-              <Field name="password" type="password" className="w-full p-2 border rounded" />
-              <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+          <button type='submit' className='w-full bg-blue-600 text-white py-2 rounded'>
+            Login
+          </button>
+        </form>
 
-              <div className="flex justify-between items-center mt-6">
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded bg-blue-600 text-white"
-                  disabled={loading || isSubmitting}
-                >
-                  {loading ? 'Logging...' : 'Login'}
-                </button>
-
-                <button onClick={onClose} type="button" className="text-sm text-gray-600">Cancel</button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+        <button onClick={onClose} className='mt-4 text-sm underline'>Close</button>
       </div>
     </div>
   );
 }
+

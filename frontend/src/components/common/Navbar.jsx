@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import LoginModal from './LoginModal.jsx';
-import RegisterModal from './RegisterModal.jsx';
+﻿import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
+import LoginModal from './LoginModal.jsx';
+import RegisterModal from './RegisterModal.jsx';
 
 export default function Navbar() {
   const { user } = useSelector(s => s.auth);
@@ -12,12 +13,24 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="flex items-center justify-between px-6 py-4 shadow">
-        <div className="text-xl font-bold">Packers & Movers</div>
-        <div className="space-x-4 flex items-center">
-          <button onClick={() => setLoginOpen(true)} className="px-3 py-1 rounded bg-blue-600 text-white">Login</button>
-          <button onClick={() => setRegisterOpen(true)} className="px-3 py-1 rounded border">Register</button>
-          {user && <button onClick={() => dispatch(logout())}>Logout</button>}
+      <nav className='px-6 py-4 shadow flex justify-between bg-white items-center'>
+        <Link to='/' className='text-xl font-bold'>Packers & Movers</Link>
+
+        <div className='flex items-center gap-4'>
+          <Link to='/services'>Services</Link>
+          <Link to='/contact'>Contact</Link>
+
+          {!user ? (
+            <>
+              <button onClick={() => setLoginOpen(true)} className='px-3 py-1 bg-blue-600 text-white rounded'>Login</button>
+              <button onClick={() => setRegisterOpen(true)} className='px-3 py-1 border rounded'>Register</button>
+            </>
+          ) : (
+            <>
+              <span className='px-3 py-1 border rounded'>Hi, {user.name}</span>
+              <button onClick={() => dispatch(logout())} className='text-sm underline'>Logout</button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -26,3 +39,4 @@ export default function Navbar() {
     </>
   );
 }
+

@@ -137,6 +137,13 @@ const quoteSchema = new mongoose.Schema(
       maxlength: [1000, "Special instructions cannot exceed 1000 characters"],
     },
 
+    // Payment Preference
+    paymentMethod: {
+      type: String,
+      enum: ["credit_card", "debit_card", "upi", "net_banking", "cash", ""],
+      default: "",
+    },
+
     // Quote Processing
     quoteId: {
       type: String,

@@ -17,6 +17,9 @@ import {
   FiClock,
   FiCheckCircle,
   FiAlertCircle,
+  FiCreditCard,
+  FiSmartphone,
+  FiDollarSign,
 } from "react-icons/fi";
 import {
   FaTruck,
@@ -64,6 +67,8 @@ const Quote = () => {
     alternatePhone: "",
     preferredTime: "",
     specialInstructions: "",
+    // Payment Preference
+    paymentMethod: "",
   });
 
   const [estimatedCost, setEstimatedCost] = useState(null);
@@ -90,6 +95,14 @@ const Quote = () => {
     { value: "office", label: "Office", desc: "Office space" },
     { value: "shop", label: "Shop", desc: "Commercial shop" },
     { value: "other", label: "Other", desc: "Other property type" },
+  ];
+
+  const paymentMethods = [
+    { value: "credit_card", label: "Credit Card", icon: FiCreditCard, desc: "Visa, Mastercard, Rupay" },
+    { value: "debit_card", label: "Debit Card", icon: FiCreditCard, desc: "All bank debit cards" },
+    { value: "upi", label: "UPI / Online", icon: FiSmartphone, desc: "GPay, PhonePe, Paytm" },
+    { value: "net_banking", label: "Net Banking", icon: FiDollarSign, desc: "All major banks" },
+    { value: "cash", label: "Cash on Delivery", icon: FiDollarSign, desc: "Pay after service" },
   ];
 
   const inventoryItems = [
@@ -677,6 +690,49 @@ const Quote = () => {
               />
             </div>
 
+            {/* Payment Method Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Preferred Payment Method
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {paymentMethods.map((method) => (
+                  <div
+                    key={method.value}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        paymentMethod: method.value,
+                      }))
+                    }
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
+                      formData.paymentMethod === method.value
+                        ? "border-primary bg-primary/5 shadow-md"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <method.icon
+                      className={`text-2xl mx-auto mb-2 ${
+                        formData.paymentMethod === method.value
+                          ? "text-primary"
+                          : "text-gray-500"
+                      }`}
+                    />
+                    <p
+                      className={`font-semibold text-sm ${
+                        formData.paymentMethod === method.value
+                          ? "text-primary"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {method.label}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{method.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Summary */}
             {estimatedCost && (
               <div className="bg-primary/5 border border-primary/20 p-6 rounded-xl">
@@ -710,6 +766,14 @@ const Quote = () => {
                       ₹{estimatedCost.toLocaleString()}
                     </span>
                   </div>
+                  {formData.paymentMethod && (
+                    <div className="flex justify-between mt-2">
+                      <span className="text-gray-600">Payment Method:</span>
+                      <span className="font-medium capitalize">
+                        {paymentMethods.find(m => m.value === formData.paymentMethod)?.label || formData.paymentMethod}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -783,6 +847,7 @@ const Quote = () => {
                     alternatePhone: "",
                     preferredTime: "",
                     specialInstructions: "",
+                    paymentMethod: "",
                   });
                   setEstimatedCost(null);
                 }}

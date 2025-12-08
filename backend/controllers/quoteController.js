@@ -30,6 +30,7 @@ exports.createQuote = async (req, res) => {
       storageRequired,
       insuranceRequired,
       specialInstructions,
+      paymentMethod,
     } = req.body;
 
     // Create quote
@@ -57,6 +58,7 @@ exports.createQuote = async (req, res) => {
       storageRequired,
       insuranceRequired,
       specialInstructions,
+      paymentMethod,
       user: req.user ? req.user.id : null,
     });
 

@@ -12,6 +12,7 @@ const {
   getMyQuotes,
   deleteQuote,
   getQuoteStats,
+  claimQuotes,
 } = require("../controllers/quoteController");
 
 // Validation rules
@@ -57,11 +58,15 @@ const createQuoteValidation = [
 ];
 
 // Public routes
-// @route   POST /api/quotes - Create new quote request
-router.post("/", createQuoteValidation, validate, createQuote);
-
 // @route   GET /api/quotes/track/:quoteId - Track quote by ID
 router.get("/track/:quoteId", trackQuote);
+
+// Private routes (require authentication)
+// @route   POST /api/quotes - Create new quote request
+router.post("/", protect, createQuoteValidation, validate, createQuote);
+
+// @route   POST /api/quotes/claim - Claim unassigned quotes by email
+router.post("/claim", protect, claimQuotes);
 
 // Private routes (logged in users)
 // @route   GET /api/quotes/my-quotes - Get user's quotes

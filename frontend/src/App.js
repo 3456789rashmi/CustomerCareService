@@ -24,14 +24,19 @@ import Network from "./pages/Network";
 import Enquiry from "./pages/Enquiry";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import QuoteTracking from "./pages/QuoteTracking";
+import TrackShipment from "./pages/TrackShipment";
 import AdminDashboard from "./pages/AdminDashboard";
 import "./App.css";
 
 // Layout component to conditionally show Navbar/Footer
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideNavFooter = ["/login", "/register"].includes(location.pathname);
+  const hideNavFooter = ["/login", "/register", "/forgot-password"].includes(
+    location.pathname
+  );
 
   return (
     <div className="min-h-screen bg-neutral flex flex-col">
@@ -51,12 +56,20 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
             <Route path="/about" element={<About />} />
-            <Route path="/quote" element={<Quote />} />
+            <Route path="/quote" element={
+              <ProtectedRoute>
+                <Quote />
+              </ProtectedRoute>
+            } />
             <Route path="/contact" element={<Contact />} />
             <Route path="/clients" element={<Clients />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/network" element={<Network />} />
-            <Route path="/enquiry" element={<Enquiry />} />
+            <Route path="/enquiry" element={
+              <ProtectedRoute>
+                <Enquiry />
+              </ProtectedRoute>
+            } />
             <Route
               path="/login"
               element={
@@ -74,10 +87,34 @@ function App() {
               }
             />
             <Route
+              path="/forgot-password"
+              element={
+                <GuestRoute>
+                  <ForgotPassword />
+                </GuestRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quote-tracking/:quoteId"
+              element={
+                <ProtectedRoute>
+                  <QuoteTracking />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/track-shipment"
+              element={
+                <ProtectedRoute>
+                  <TrackShipment />
                 </ProtectedRoute>
               }
             />

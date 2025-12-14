@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const Quote = require("../models/Quote");
 const Enquiry = require("../models/Enquiry");
+const fs = require("fs");
+const path = require("path");
 
 // @desc    Get user dashboard data
 // @route   GET /api/users/dashboard
@@ -8,6 +10,8 @@ const Enquiry = require("../models/Enquiry");
 exports.getDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    console.log("Getting dashboard for user:", userId);
 
     // Get user's quotes summary
     const totalQuotes = await Quote.countDocuments({ user: userId });
@@ -23,6 +27,8 @@ exports.getDashboard = async (req, res) => {
       user: userId,
       status: "completed",
     });
+
+    console.log("Quote counts - Total:", totalQuotes, "Pending:", pendingQuotes, "Accepted:", acceptedQuotes, "Completed:", completedQuotes);
 
     // Get recent quotes
     const recentQuotes = await Quote.find({ user: userId })
@@ -48,18 +54,14 @@ exports.getDashboard = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        quotes: {
-          total: totalQuotes,
-          pending: pendingQuotes,
-          accepted: acceptedQuotes,
-          completed: completedQuotes,
-          recent: recentQuotes,
-        },
-        enquiries: {
-          total: totalEnquiries,
-          pending: pendingEnquiries,
-          recent: recentEnquiries,
-        },
+        totalQuotes,
+        pendingQuotes: pendingQuotes,
+        inProgressQuotes: acceptedQuotes,
+        completedQuotes: completedQuotes,
+        recentQuotes: recentQuotes,
+        totalEnquiries,
+        pendingEnquiries: pendingEnquiries,
+        recentEnquiries: recentEnquiries,
       },
     });
   } catch (error) {
@@ -98,14 +100,51 @@ exports.updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, phone, address } = req.body;
 
+    // Get current user to check existing avatar
+    const currentUser = await User.findById(req.user.id);
+
+    // Prepare update object
+    const updateData = {
+      firstName,
+      lastName,
+      phone,
+      address,
+    };
+
+    // Handle avatar upload
+    if (req.file) {
+      // Delete old avatar if it exists
+      if (currentUser.avatar) {
+        const oldAvatarPath = path.join(__dirname, "..", currentUser.avatar);
+        try {
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+          }
+        } catch (err) {
+          console.error("Error deleting old avatar:", err);
+          // Don't fail the request if old file deletion fails
+        }
+      }
+      updateData.avatar = `/uploads/avatars/${req.file.filename}`;
+    } else if (req.body.avatar === null || req.body.avatar === "null") {
+      // Allow avatar removal
+      if (currentUser.avatar) {
+        const oldAvatarPath = path.join(__dirname, "..", currentUser.avatar);
+        try {
+          if (fs.existsSync(oldAvatarPath)) {
+            fs.unlinkSync(oldAvatarPath);
+          }
+        } catch (err) {
+          console.error("Error deleting avatar:", err);
+          // Don't fail the request if file deletion fails
+        }
+      }
+      updateData.avatar = null;
+    }
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      {
-        firstName,
-        lastName,
-        phone,
-        address,
-      },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -130,6 +169,8 @@ exports.getUserQuotes = async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
 
+    console.log("Getting quotes for user:", req.user.id, "Status filter:", status);
+
     const query = { user: req.user.id };
     if (status) query.status = status;
 
@@ -144,6 +185,8 @@ exports.getUserQuotes = async (req, res) => {
       );
 
     const total = await Quote.countDocuments(query);
+
+    console.log("Found", quotes.length, "quotes out of total", total);
 
     res.status(200).json({
       success: true,
@@ -165,25 +208,43 @@ exports.getUserQuotes = async (req, res) => {
 // @desc    Get single quote detail for user
 // @route   GET /api/users/quotes/:id
 // @access  Private
+// @desc    Get single quote detail for user
+// @route   GET /api/users/quotes/:id
+// @access  Private
 exports.getUserQuoteDetail = async (req, res) => {
   try {
-    const quote = await Quote.findOne({
-      _id: req.params.id,
+    console.log("Getting quote detail for user:", req.user.id, "Quote ID:", req.params.id);
+
+    // First try to find by quoteId (the user-facing quote ID like UP2512XXXX)
+    let quote = await Quote.findOne({
+      quoteId: req.params.id,
       user: req.user.id,
     });
 
+    // If not found by quoteId, try by MongoDB _id
     if (!quote) {
+      quote = await Quote.findOne({
+        _id: req.params.id,
+        user: req.user.id,
+      });
+    }
+
+    if (!quote) {
+      console.log("Quote not found:", req.params.id);
       return res.status(404).json({
         success: false,
         message: "Quote not found",
       });
     }
 
+    console.log("Quote found:", quote.quoteId);
+
     res.status(200).json({
       success: true,
       data: quote,
     });
   } catch (error) {
+    console.error("Get quote detail error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch quote",
@@ -199,7 +260,13 @@ exports.getUserEnquiries = async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
 
-    const query = { user: req.user.id };
+    // Search by both user ID and email (in case enquiry was submitted without being logged in)
+    const query = {
+      $or: [
+        { user: req.user.id },
+        { email: req.user.email }
+      ]
+    };
     if (status) query.status = status;
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -207,10 +274,7 @@ exports.getUserEnquiries = async (req, res) => {
     const enquiries = await Enquiry.find(query)
       .sort("-createdAt")
       .skip(skip)
-      .limit(parseInt(limit))
-      .select(
-        "enquiryId subject enquiryType status response createdAt respondedAt"
-      );
+      .limit(parseInt(limit));
 
     const total = await Enquiry.countDocuments(query);
 
@@ -323,6 +387,23 @@ exports.acceptQuote = async (req, res) => {
 // @access  Private
 exports.deleteAccount = async (req, res) => {
   try {
+    // Get user to retrieve avatar path
+    const user = await User.findById(req.user.id);
+
+    // Delete avatar file if it exists
+    if (user.avatar) {
+      const avatarPath = path.join(__dirname, "..", user.avatar);
+      try {
+        if (fs.existsSync(avatarPath)) {
+          fs.unlinkSync(avatarPath);
+        }
+      } catch (err) {
+        console.error("Error deleting user avatar:", err);
+        // Don't fail the request if file deletion fails
+      }
+    }
+
+    // Delete user from database
     await User.findByIdAndDelete(req.user.id);
 
     res.status(200).json({

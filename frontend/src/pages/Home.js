@@ -46,37 +46,37 @@ const Home = () => {
       icon: FaTruck,
       title: "Household Shifting",
       desc: "Complete home relocation with careful packing and safe transport of your belongings.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
     {
       icon: FaBoxOpen,
       title: "Office Relocation",
       desc: "Minimize business downtime with our efficient corporate moving solutions.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
     {
       icon: FaCar,
       title: "Car Transportation",
       desc: "Safe and secure vehicle shipping to any destination across India.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
     {
       icon: FaWarehouse,
       title: "Warehouse Storage",
       desc: "Secure storage facilities for short-term and long-term needs.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
     {
       icon: FaGlobe,
       title: "International Moving",
       desc: "Hassle-free international relocation with customs clearance support.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
     {
       icon: FaHandshake,
       title: "Corporate Solutions",
       desc: "Tailored moving solutions for businesses of all sizes.",
-      color: "bg-[#A888B5]",
+      color: "bg-[#0EA5E9]",
     },
   ];
 
@@ -171,16 +171,17 @@ const Home = () => {
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-secondary to-primary min-h-[90vh] flex items-center">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          />
-        </div>
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden" style={{
+        backgroundImage: "url('/bg.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        {/* Darker Animated Overlay */}
+        <motion.div
+          className="absolute inset-0 bg-black/50"
+          animate={{ opacity: [0.45, 0.6, 0.45] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        />
 
         <div className="max-w-7xl mx-auto px-4 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -188,15 +189,16 @@ const Home = () => {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
+              className="lg:col-start-2"
             >
-              <span className="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <span className="inline-block bg-primary/40 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
                 🚚 #1 Rated Packers & Movers in India
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
                 Your Trusted Partner for
-                <span className="text-accent block">Safe & Swift Moving</span>
+                <span className="text-[#FF6EC7] block">Safe & Swift Moving</span>
               </h1>
-              <p className="text-xl text-white/90 mb-8 leading-relaxed">
+              <p className="text-xl text-white mb-8 leading-relaxed">
                 Experience stress-free relocation with India's most reliable
                 packers and movers. From local shifting to international moves,
                 we handle it all with care and precision.
@@ -204,13 +206,13 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/quote"
-                  className="inline-flex items-center justify-center bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center bg-[#00D9FF] text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#00B8D4] transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Get Free Quote <FiArrowRight className="ml-2" />
                 </Link>
                 <a
                   href="tel:+919876543210"
-                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300"
+                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-black transition-all duration-300"
                 >
                   <FiPhone className="mr-2" /> Call Now
                 </a>
@@ -218,73 +220,18 @@ const Home = () => {
 
               {/* Trust Badges */}
               <div className="mt-10 flex flex-wrap items-center gap-6">
-                <div className="flex items-center text-white/80">
-                  <FiCheckCircle className="text-accent mr-2" />
-                  <span>Free Estimate</span>
+                <div className="flex items-center text-white">
+                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+                  <span className="text-white">Free Estimate</span>
                 </div>
-                <div className="flex items-center text-white/80">
-                  <FiCheckCircle className="text-accent mr-2" />
-                  <span>Insured Moving</span>
+                <div className="flex items-center text-white">
+                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+                  <span className="text-white">Insured Moving</span>
                 </div>
-                <div className="flex items-center text-white/80">
-                  <FiCheckCircle className="text-accent mr-2" />
-                  <span>24/7 Support</span>
+                <div className="flex items-center text-white">
+                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+                  <span className="text-white">24/7 Support</span>
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Hero Image/Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="hidden lg:block"
-            >
-              <div className="bg-white rounded-2xl shadow-2xl p-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                  Quick Quote Request
-                </h3>
-                <form className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Moving From
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter pickup city"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Moving To
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter destination city"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="Enter your phone number"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-primary text-white py-4 rounded-lg font-semibold hover:bg-secondary transition-colors duration-300"
-                  >
-                    Get Instant Quote
-                  </button>
-                </form>
-                <p className="text-center text-gray-500 text-sm mt-4">
-                  No spam, we respect your privacy
-                </p>
               </div>
             </motion.div>
           </div>
@@ -417,7 +364,7 @@ const Home = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <span className="text-accent font-semibold text-lg">
+              <span className="text-secondary font-semibold text-lg">
                 Why Choose Us
               </span>
               <h2 className="text-4xl font-bold text-white mt-2 mb-6">

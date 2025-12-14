@@ -285,9 +285,12 @@ exports.forgotPassword = async (req, res) => {
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
 
+      console.error("Email sending error:", emailError);
+
       return res.status(500).json({
         success: false,
-        message: "Email could not be sent",
+        message: "Email could not be sent. Please try again later or contact support.",
+        error: process.env.NODE_ENV === "development" ? emailError.message : undefined,
       });
     }
   } catch (error) {

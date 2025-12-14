@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   FiTarget,
   FiEye,
-  FiHeart,
   FiAward,
   FiUsers,
   FiTruck,
@@ -401,14 +400,12 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className={`relative flex items-center mb-8 ${
-                  idx % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                }`}
+                className={`relative flex items-center mb-8 ${idx % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                  }`}
               >
                 <div
-                  className={`w-full md:w-1/2 ${
-                    idx % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"
-                  }`}
+                  className={`w-full md:w-1/2 ${idx % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"
+                    }`}
                 >
                   <div className="bg-neutral p-6 rounded-xl shadow-lg">
                     <span className="text-primary font-bold text-lg">

@@ -251,10 +251,10 @@ const Network = () => {
                     x2="100%"
                     y2="100%"
                   >
-                    <stop offset="0%" stopColor="#F1BCCF" stopOpacity="0.85" />
+                    <stop offset="0%" stopColor="#FFBF00" stopOpacity="0.85" />
                     <stop
                       offset="100%"
-                      stopColor="#9F7BB5"
+                      stopColor="#FFA500"
                       stopOpacity="0.65"
                     />
                   </linearGradient>
@@ -336,26 +336,26 @@ const Network = () => {
                     <text
                       x={
                         loc.city === "Mumbai" ||
-                        loc.city === "Ahmedabad" ||
-                        loc.city === "Kochi" ||
-                        loc.city === "Pune"
+                          loc.city === "Ahmedabad" ||
+                          loc.city === "Kochi" ||
+                          loc.city === "Pune"
                           ? loc.x - 12
                           : loc.city === "Kolkata" || loc.city === "Guwahati"
-                          ? loc.x + 12
-                          : loc.x
+                            ? loc.x + 12
+                            : loc.x
                       }
                       y={loc.y - 16}
                       textAnchor={
                         loc.city === "Mumbai" ||
-                        loc.city === "Ahmedabad" ||
-                        loc.city === "Kochi" ||
-                        loc.city === "Pune"
+                          loc.city === "Ahmedabad" ||
+                          loc.city === "Kochi" ||
+                          loc.city === "Pune"
                           ? "end"
                           : loc.city === "Kolkata" || loc.city === "Guwahati"
-                          ? "start"
-                          : "middle"
+                            ? "start"
+                            : "middle"
                       }
-                      fill="#3B0A45"
+                      fill="#FFBF00"
                       fontSize="11"
                       fontWeight="600"
                     >
@@ -389,11 +389,10 @@ const Network = () => {
               <button
                 key={region.id}
                 onClick={() => setSelectedRegion(region.id)}
-                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                  selectedRegion === region.id
+                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${selectedRegion === region.id
                     ? "bg-primary text-white shadow-lg"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 {region.label}
               </button>
@@ -413,9 +412,8 @@ const Network = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className={`bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 relative ${
-                  branch.isHub ? "border-2 border-primary" : ""
-                }`}
+                className={`bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 relative ${branch.isHub ? "border-2 border-primary" : ""
+                  }`}
               >
                 {branch.isHub && (
                   <span className="absolute -top-3 left-4 bg-primary text-white px-3 py-1 text-xs rounded-full font-semibold">

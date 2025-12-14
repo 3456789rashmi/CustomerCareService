@@ -3,6 +3,7 @@ const router = express.Router();
 const { body } = require("express-validator");
 const { validate } = require("../middleware/validation");
 const { protect } = require("../middleware/auth");
+const User = require("../models/User");
 const {
   register,
   login,
@@ -33,13 +34,25 @@ const registerValidation = [
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("Please enter a valid email"),
+    .withMessage("Please enter a valid email")
+    .custom(async (value) => {
+      const user = await User.findOne({ email: value.toLowerCase() });
+      if (user) {
+        throw new Error("User is already registered with this email");
+      }
+    }),
   body("phone")
     .trim()
     .notEmpty()
     .withMessage("Phone number is required")
     .matches(/^[0-9]{10}$/)
-    .withMessage("Please enter a valid 10-digit phone number"),
+    .withMessage("Please enter a valid 10-digit phone number")
+    .custom(async (value) => {
+      const user = await User.findOne({ phone: value });
+      if (user) {
+        throw new Error("User is already registered with this phone number");
+      }
+    }),
   body("password")
     .notEmpty()
     .withMessage("Password is required")

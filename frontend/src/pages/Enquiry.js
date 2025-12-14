@@ -1,61 +1,128 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiSend,
-  FiCheck,
   FiPhone,
   FiMail,
-  FiClock,
-  FiAlertCircle,
+  FiMessageCircle,
+  FiX,
+  FiCheck,
 } from "react-icons/fi";
-import {
-  FaHome,
-  FaBuilding,
-  FaCar,
-  FaWarehouse,
-  FaGlobe,
-  FaBoxOpen,
-  FaWhatsapp,
-} from "react-icons/fa";
 import { enquiryAPI } from "../services/api";
 
 const Enquiry = () => {
+  const [chatMessages, setChatMessages] = useState([
+    {
+      id: 1,
+      type: "bot",
+      text: "Hello! 👋 Welcome to UnitedPackers. How can I help you today? Feel free to ask any questions or select from the suggestions below.",
+    },
+  ]);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const chatEndRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     city: "",
-    serviceType: "",
-    moveDate: "",
-    fromLocation: "",
-    toLocation: "",
     message: "",
-    callbackTime: "",
+    callbackTime: "Morning (9 AM - 12 PM)",
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
-  const [enquiryId, setEnquiryId] = useState(null);
 
-  const serviceTypes = [
-    { id: "household", label: "Household Shifting", icon: FaHome },
-    { id: "office", label: "Office Relocation", icon: FaBuilding },
-    { id: "car", label: "Car Transportation", icon: FaCar },
-    { id: "storage", label: "Warehouse Storage", icon: FaWarehouse },
-    { id: "international", label: "International Moving", icon: FaGlobe },
-    { id: "packing", label: "Packing Only", icon: FaBoxOpen },
+  // Pre-prepared Q&A
+  const qaDatabase = [
+    {
+      id: 1,
+      question: "How long does delivery take?",
+      answer:
+        "Delivery time depends on the distance and type of move:\n\n• Local shifts (same city): 1-2 days\n• Interstate moves: 3-7 days\n• International moves: 2-4 weeks\n\nWe provide real-time tracking so you can monitor your shipment throughout the journey. For urgent deliveries, we offer our Express Delivery service with guaranteed timelines.",
+    },
+    {
+      id: 2,
+      question: "How can I track my shipment?",
+      answer:
+        "Tracking your shipment is easy! You can:\n\n1. Log in to your dashboard\n2. Go to 'Track Shipment' from the Services menu\n3. Select your quote to view:\n   • Current location\n   • Estimated arrival time\n   • Real-time GPS tracking\n   • Status updates\n\nYou'll also receive SMS and email notifications at each milestone.",
+    },
+    {
+      id: 3,
+      question: "What if I need to cancel?",
+      answer:
+        "We understand plans can change. Here's our cancellation policy:\n\n• Cancel before pickup: Full refund\n• Cancel after pickup: Charges as per agreement\n• Partial cancellation: Possible with modified quote\n\nPlease note:\n• Contact us ASAP for cancellations\n• Cancellations must be requested within 24 hours\n• A small administrative fee may apply\n\nReach out to our support team at +91 98765 43210 for cancellation requests.",
+    },
+    {
+      id: 4,
+      question: "How much will it cost?",
+      answer:
+        "Pricing depends on several factors:\n\n📦 Distance: Local vs interstate vs international\n📏 Volume: Number and type of items\n🚚 Services: Packing, unpacking, storage, insurance\n📅 Timing: Peak season pricing may apply\n\nWe offer:\n• Free, no-obligation quotes\n• Transparent pricing (no hidden costs)\n• Flexible payment options\n• Discounts for bulk moves\n\nGet your free quote now - it takes just 5 minutes!",
+    },
+    {
+      id: 5,
+      question: "Do you provide packing materials?",
+      answer:
+        "Yes! We provide comprehensive packing solutions:\n\n✓ High-quality boxes and cartons\n✓ Bubble wrap and packing paper\n✓ Foam sheets for fragile items\n✓ Wooden crates for heavy furniture\n✓ Eco-friendly options available\n\nOur expert packers use industry-best techniques to ensure maximum protection. You can also opt for:\n• DIY packing with materials provided\n• Full packing service by our team\n• Partial packing (select items)\n\nAll packing costs are included in your quote.",
+    },
+    {
+      id: 6,
+      question: "Is my shipment insured?",
+      answer:
+        "Absolutely! All shipments are fully insured:\n\n✓ Basic coverage: Included in all moves\n✓ Comprehensive coverage: Optional for valuable items\n✓ Transit insurance: Door-to-door protection\n✓ Warehouse coverage: If using storage services\n\nIn case of any damage or loss:\n• Report within 24 hours\n• Provide photos/documentation\n• We handle insurance claims quickly\n• Settlement within 7-10 days\n\nFor high-value items, we recommend comprehensive insurance at a nominal cost.",
+    },
+    {
+      id: 7,
+      question: "Can you move on weekends or holidays?",
+      answer:
+        "Yes! We offer flexible scheduling:\n\n📅 Weekend moves: Available at standard rates\n🎉 Holiday moves: Available with advance booking\n⏰ Custom timing: Early morning, late evening, night shifts\n\nFor offices:\n• After-hours moving to minimize disruption\n• Weekend shifts available\n• Extended operating hours possible\n\nBe sure to:\n• Book in advance for peak days\n• Confirm dates with our team\n• Plan for potential rate variations\n\nContact us at least 2-3 weeks before your preferred date.",
+    },
+    {
+      id: 8,
+      question: "How do I get started?",
+      answer:
+        "Getting started is simple and takes just 5 minutes:\n\n1️⃣ Fill out our quote form with your details\n2️⃣ Select your moving date and services\n3️⃣ Receive a detailed estimate instantly\n4️⃣ Our team will verify and confirm\n5️⃣ Schedule your move\n\nYou can also:\n• Call us for a phone consultation\n• Use 'Track Shipment' for status updates\n• Request an in-person survey for large moves\n\nHave questions? Chat with us anytime or call +91 98765 43210!",
+    },
   ];
 
-  const callbackTimes = [
-    "Morning (9 AM - 12 PM)",
-    "Afternoon (12 PM - 3 PM)",
-    "Evening (3 PM - 6 PM)",
-    "Any Time",
-  ];
+  // Auto scroll to bottom when new messages arrive
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setSubmitError("");
+  const handleQuestionClick = (qa) => {
+    // Add user question to chat
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        type: "user",
+        text: qa.question,
+      },
+    ]);
+
+    // Simulate bot thinking
+    setTimeout(() => {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          type: "bot",
+          text: qa.answer,
+        },
+      ]);
+    }, 500);
+
+    setSelectedQuestion(qa.id);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -64,378 +131,305 @@ const Enquiry = () => {
     setSubmitError("");
 
     try {
-      const enquiryData = {
+      // Add user message to chat
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          type: "user",
+          text: `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nMessage: ${formData.message}`,
+        },
+      ]);
+
+      await enquiryAPI.create({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         city: formData.city,
-        serviceType: formData.serviceType,
-        movingDate: formData.moveDate,
-        fromLocation: formData.fromLocation,
-        toLocation: formData.toLocation,
         message: formData.message,
         callbackTime: formData.callbackTime,
-      };
+        enquiryType: "general",
+        subject: "Customer Enquiry",
+      });
 
-      const response = await enquiryAPI.create(enquiryData);
+      setSubmitted(true);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        city: "",
+        message: "",
+        callbackTime: "Morning (9 AM - 12 PM)",
+      });
 
-      if (response.data.success) {
-        setEnquiryId(response.data.data.enquiryId);
-        setSubmitted(true);
-      }
-    } catch (err) {
-      setSubmitError(
-        err.response?.data?.message ||
-          "Failed to submit enquiry. Please try again."
-      );
+      // Bot response
+      setTimeout(() => {
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            type: "bot",
+            text: "Thank you for your enquiry! ✓\n\nWe've received your message and will get back to you shortly. Our team will contact you during your preferred callback time.\n\nEnquiry ID: " +
+              Math.random().toString(36).substr(2, 9).toUpperCase(),
+          },
+        ]);
+      }, 500);
+
+      setShowForm(false);
+    } catch (error) {
+      setSubmitError(error.response?.data?.message || "Failed to submit enquiry");
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          type: "bot",
+          text: "Sorry, there was an error submitting your enquiry. Please try again or contact us directly at +91 98765 43210.",
+        },
+      ]);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+
   return (
-    <div className="min-h-screen bg-neutral">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-secondary to-primary py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-neutral via-white to-neutral">
+      {/* Header */}
+      <section className="bg-gradient-to-r from-primary to-secondary py-12">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            className="text-center"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Quick <span className="text-light">Enquiry</span>
+            <div className="flex items-center justify-center mb-4">
+              <FiMessageCircle className="text-white text-4xl" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Customer Support Chat
             </h1>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto">
-              Fill out the form below and our team will get back to you within
-              30 minutes
+            <p className="text-white/90 text-lg max-w-2xl mx-auto">
+              Ask us anything! We have instant answers to your questions and our team is here to help.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
+      {/* Main Chat Section */}
+      <section className="py-12">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Contact Info Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl p-8 sticky top-24">
-                <h3 className="text-xl font-bold text-gray-800 mb-6">
-                  Get in Touch
-                </h3>
-
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiPhone className="text-primary text-xl" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">Call Us</p>
-                      <a
-                        href="tel:+919876543210"
-                        className="text-primary hover:text-secondary"
+            {/* Chat Window */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="lg:col-span-2 bg-white rounded-2xl shadow-lg flex flex-col h-[600px]"
+            >
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                <AnimatePresence>
+                  {chatMessages.map((msg) => (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"
+                        }`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg whitespace-pre-line ${msg.type === "user"
+                            ? "bg-primary text-white rounded-br-none"
+                            : "bg-gray-100 text-gray-800 rounded-bl-none"
+                          }`}
                       >
-                        +91 98765 43210
-                      </a>
-                      <p className="text-sm text-gray-500">
-                        Toll Free: 1800-123-4567
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FaWhatsapp className="text-primary text-xl" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">WhatsApp</p>
-                      <a
-                        href="https://wa.me/919876543210"
-                        className="text-primary hover:text-secondary"
-                      >
-                        +91 98765 43210
-                      </a>
-                      <p className="text-sm text-gray-500">Quick Response</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiMail className="text-primary text-xl" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">Email Us</p>
-                      <a
-                        href="mailto:enquiry@unitedpackers.com"
-                        className="text-primary hover:text-secondary"
-                      >
-                        enquiry@unitedpackers.com
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <FiClock className="text-primary text-xl" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">
-                        Working Hours
-                      </p>
-                      <p className="text-gray-600">Mon - Sat: 9 AM - 8 PM</p>
-                      <p className="text-gray-600">Sunday: 10 AM - 5 PM</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 p-4 bg-gradient-to-r from-primary to-secondary rounded-xl text-white">
-                  <p className="font-semibold mb-2">🎁 Special Offer</p>
-                  <p className="text-sm text-white/90">
-                    Get 10% off on your first move! Use code: FIRST10
-                  </p>
-                </div>
+                        {msg.text}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                <div ref={chatEndRef} />
               </div>
-            </div>
 
-            {/* Enquiry Form */}
-            <div className="lg:col-span-2">
-              {submitted ? (
+              {/* Form Toggle Button */}
+              {!showForm && !submitted && (
+                <div className="border-t p-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowForm(true)}
+                    className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 hover:shadow-lg transition-shadow"
+                  >
+                    <FiSend /> Send Your Own Enquiry
+                  </motion.button>
+                </div>
+              )}
+
+              {/* Form Section */}
+              <AnimatePresence>
+                {showForm && (
+                  <motion.form
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    onSubmit={handleSubmit}
+                    className="border-t p-4 space-y-3 bg-gray-50"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-gray-800">
+                        Send us your enquiry
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => setShowForm(false)}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <FiX className="text-xl" />
+                      </button>
+                    </div>
+
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary"
+                    />
+
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Your email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary"
+                    />
+
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Your phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary"
+                    />
+
+                    <textarea
+                      name="message"
+                      placeholder="Your message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows="3"
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary resize-none"
+                    />
+
+                    <select
+                      name="callbackTime"
+                      value={formData.callbackTime}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-primary"
+                    >
+                      <option>Morning (9 AM - 12 PM)</option>
+                      <option>Afternoon (12 PM - 5 PM)</option>
+                      <option>Evening (5 PM - 9 PM)</option>
+                      <option>Any Time</option>
+                    </select>
+
+                    {submitError && (
+                      <p className="text-red-500 text-sm">{submitError}</p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-primary text-white py-2 rounded-lg font-semibold hover:bg-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? "Sending..." : <>
+                        <FiSend /> Send Enquiry
+                      </>}
+                    </button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+
+              {/* Success Message */}
+              {submitted && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-2xl shadow-xl p-12 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="border-t p-4 bg-green-50 text-center"
                 >
-                  <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <FiCheck className="text-green-600 text-4xl" />
+                  <div className="flex items-center justify-center gap-2 text-green-600 font-semibold mb-2">
+                    <FiCheck className="text-xl" />
+                    Enquiry Submitted Successfully!
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                    Thank You!
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    Your enquiry has been submitted successfully. Our team will
-                    contact you within 30 minutes.
-                  </p>
-                  <p className="text-primary font-semibold">
-                    Reference ID: ENQ{Date.now().toString().slice(-8)}
+                  <p className="text-green-600 text-sm mb-3">
+                    We'll be in touch soon. Check your email for confirmation.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
-                    className="mt-8 bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition-colors"
+                    className="text-primary font-semibold text-sm hover:underline"
                   >
-                    Submit Another Enquiry
+                    Ask another question
                   </button>
                 </motion.div>
-              ) : (
-                <motion.form
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  onSubmit={handleSubmit}
-                  className="bg-white rounded-2xl shadow-xl p-8"
-                >
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    Fill Your Details
-                  </h2>
-
-                  {/* Service Type Selection */}
-                  <div className="mb-8">
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
-                      Select Service Type *
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {serviceTypes.map((service) => (
-                        <label
-                          key={service.id}
-                          className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                            formData.serviceType === service.id
-                              ? "border-primary bg-primary/5"
-                              : "border-gray-200 hover:border-primary/50"
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="serviceType"
-                            value={service.id}
-                            checked={formData.serviceType === service.id}
-                            onChange={handleChange}
-                            className="hidden"
-                          />
-                          <service.icon
-                            className={`text-xl ${
-                              formData.serviceType === service.id
-                                ? "text-primary"
-                                : "text-gray-400"
-                            }`}
-                          />
-                          <span
-                            className={`text-sm font-medium ${
-                              formData.serviceType === service.id
-                                ? "text-primary"
-                                : "text-gray-700"
-                            }`}
-                          >
-                            {service.label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Personal Details */}
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Enter your name"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                        placeholder="+91 XXXXX XXXXX"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="your@email.com"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Current City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        required
-                        placeholder="Your current city"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Location Details */}
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Moving From *
-                      </label>
-                      <input
-                        type="text"
-                        name="fromLocation"
-                        value={formData.fromLocation}
-                        onChange={handleChange}
-                        required
-                        placeholder="Source location"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Moving To *
-                      </label>
-                      <input
-                        type="text"
-                        name="toLocation"
-                        value={formData.toLocation}
-                        onChange={handleChange}
-                        required
-                        placeholder="Destination location"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Preferred Move Date
-                      </label>
-                      <input
-                        type="date"
-                        name="moveDate"
-                        value={formData.moveDate}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Best Time to Call
-                      </label>
-                      <select
-                        name="callbackTime"
-                        value={formData.callbackTime}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                      >
-                        <option value="">Select time slot</option>
-                        {callbackTimes.map((time, idx) => (
-                          <option key={idx} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Message */}
-                  <div className="mb-8">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Additional Details
-                    </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows="4"
-                      placeholder="Tell us more about your requirements (items to move, special handling needs, etc.)"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg"
-                  >
-                    <FiSend /> Submit Enquiry
-                  </button>
-
-                  <p className="text-center text-gray-500 text-sm mt-4">
-                    By submitting, you agree to our terms and privacy policy
-                  </p>
-                </motion.form>
               )}
-            </div>
+            </motion.div>
+
+            {/* Suggested Questions Sidebar */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="lg:col-span-1"
+            >
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">
+                  Frequently Asked Questions
+                </h3>
+
+                <div className="space-y-2">
+                  {qaDatabase.map((qa) => (
+                    <motion.button
+                      key={qa.id}
+                      whileHover={{ x: 5 }}
+                      onClick={() => handleQuestionClick(qa)}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition-all text-sm font-medium ${selectedQuestion === qa.id
+                          ? "bg-primary text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      {qa.question}
+                    </motion.button>
+                  ))}
+                </div>
+
+                {/* Contact Info */}
+                <div className="mt-6 pt-6 border-t space-y-3">
+                  <p className="text-sm text-gray-600 font-semibold">
+                    Need immediate help?
+                  </p>
+                  <a
+                    href="tel:+919876543210"
+                    className="flex items-center gap-2 text-primary hover:text-secondary transition-colors text-sm font-semibold"
+                  >
+                    <FiPhone className="text-lg" />
+                    +91 98765 43210
+                  </a>
+                  <a
+                    href="mailto:support@unitedpackers.com"
+                    className="flex items-center gap-2 text-primary hover:text-secondary transition-colors text-sm font-semibold"
+                  >
+                    <FiMail className="text-lg" />
+                    support@unitedpackers.com
+                  </a>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>

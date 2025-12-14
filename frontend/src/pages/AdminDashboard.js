@@ -7,15 +7,13 @@ import {
   FiMail,
   FiTrendingUp,
   FiCheck,
-  FiClock,
   FiX,
   FiEye,
+  FiEyeOff,
   FiEdit,
   FiTrash2,
   FiSearch,
-  FiFilter,
   FiRefreshCw,
-  FiDollarSign,
   FiShield,
   FiUser,
   FiPhone,
@@ -71,6 +69,10 @@ const AdminDashboard = () => {
     type: "",
     message: "",
   });
+
+  // Password visibility states for Create Admin form
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showAdminConfirmPassword, setShowAdminConfirmPassword] = useState(false);
 
   // Real-time updates state
   const [isLiveUpdating, setIsLiveUpdating] = useState(true);
@@ -206,7 +208,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchQuotes = async () => {
+  const fetchQuotes = useCallback(async () => {
     try {
       const res = await adminAPI.getAllQuotes({
         status: statusFilter !== "all" ? statusFilter : undefined,
@@ -215,9 +217,9 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error("Failed to fetch quotes:", err);
     }
-  };
+  }, [statusFilter]);
 
-  const fetchEnquiries = async () => {
+  const fetchEnquiries = useCallback(async () => {
     try {
       const res = await adminAPI.getAllEnquiries({
         status: statusFilter !== "all" ? statusFilter : undefined,
@@ -226,9 +228,9 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error("Failed to fetch enquiries:", err);
     }
-  };
+  }, [statusFilter]);
 
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     try {
       const res = await adminAPI.getAllContacts({
         status: statusFilter !== "all" ? statusFilter : undefined,
@@ -237,23 +239,23 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error("Failed to fetch contacts:", err);
     }
-  };
+  }, [statusFilter]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await adminAPI.getUsers();
       setUsers(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch users:", err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (activeTab === "quotes") fetchQuotes();
     if (activeTab === "enquiries") fetchEnquiries();
     if (activeTab === "contacts") fetchContacts();
     if (activeTab === "users") fetchUsers();
-  }, [activeTab, statusFilter]);
+  }, [activeTab, statusFilter, fetchQuotes, fetchEnquiries, fetchContacts, fetchUsers]);
 
   const updateQuoteStatus = async (id, status) => {
     try {
@@ -459,6 +461,8 @@ const AdminDashboard = () => {
       fetchUsers();
       setTimeout(() => {
         setShowCreateAdminModal(false);
+        setShowAdminPassword(false);
+        setShowAdminConfirmPassword(false);
       }, 2000);
     } catch (err) {
       setCreateAdminMessage({
@@ -562,9 +566,8 @@ const AdminDashboard = () => {
               <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-3">
                 <button
                   onClick={() => setIsLiveUpdating(!isLiveUpdating)}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                    isLiveUpdating ? "text-green-300" : "text-white/60"
-                  }`}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiveUpdating ? "text-green-300" : "text-white/60"
+                    }`}
                 >
                   {isLiveUpdating ? (
                     <>
@@ -617,11 +620,10 @@ const AdminDashboard = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all ${
-                      activeTab === tab.id
-                        ? "bg-primary text-white"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all ${activeTab === tab.id
+                      ? "bg-primary text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
                   >
                     <div className="flex items-center">
                       <tab.icon className="mr-3" />
@@ -629,11 +631,10 @@ const AdminDashboard = () => {
                     </div>
                     {tab.badge > 0 && (
                       <span
-                        className={`text-xs px-2 py-1 rounded-full animate-pulse ${
-                          activeTab === tab.id
-                            ? "bg-white text-primary"
-                            : "bg-red-500 text-white"
-                        }`}
+                        className={`text-xs px-2 py-1 rounded-full animate-pulse ${activeTab === tab.id
+                          ? "bg-white text-primary"
+                          : "bg-red-500 text-white"
+                          }`}
                       >
                         +{tab.badge}
                       </span>
@@ -1209,11 +1210,10 @@ const AdminDashboard = () => {
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-3">
                                   <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
-                                      user.role === "admin"
-                                        ? "bg-gradient-to-r from-primary to-secondary"
-                                        : "bg-gray-400"
-                                    }`}
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${user.role === "admin"
+                                      ? "bg-gradient-to-r from-primary to-secondary"
+                                      : "bg-gray-400"
+                                      }`}
                                   >
                                     {user.firstName?.charAt(0)}
                                     {user.lastName?.charAt(0)}
@@ -1245,15 +1245,13 @@ const AdminDashboard = () => {
                                     handleChangeRole(user._id, e.target.value)
                                   }
                                   disabled={user._id === currentUser?._id}
-                                  className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
-                                    user.role === "admin"
-                                      ? "bg-purple-100 text-purple-800 border border-purple-300"
-                                      : "bg-gray-100 text-gray-700 border border-gray-300"
-                                  } ${
-                                    user._id === currentUser?._id
+                                  className={`px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-colors ${user.role === "admin"
+                                    ? "bg-purple-100 text-purple-800 border border-purple-300"
+                                    : "bg-gray-100 text-gray-700 border border-gray-300"
+                                    } ${user._id === currentUser?._id
                                       ? "cursor-not-allowed opacity-60"
                                       : "hover:opacity-80"
-                                  }`}
+                                    }`}
                                 >
                                   <option value="user">User</option>
                                   <option value="admin">Admin</option>
@@ -1290,11 +1288,10 @@ const AdminDashboard = () => {
                                       openUserModal(user, "delete")
                                     }
                                     disabled={user._id === currentUser?._id}
-                                    className={`p-2 rounded-lg transition-colors ${
-                                      user._id === currentUser?._id
-                                        ? "text-gray-300 cursor-not-allowed"
-                                        : "text-red-600 hover:bg-red-50"
-                                    }`}
+                                    className={`p-2 rounded-lg transition-colors ${user._id === currentUser?._id
+                                      ? "text-gray-300 cursor-not-allowed"
+                                      : "text-red-600 hover:bg-red-50"
+                                      }`}
                                     title={
                                       user._id === currentUser?._id
                                         ? "Can't delete yourself"
@@ -1342,15 +1339,14 @@ const AdminDashboard = () => {
 
             {/* Status Banner */}
             <div
-              className={`p-3 rounded-lg mb-4 ${
-                selectedItem.status === "completed"
-                  ? "bg-green-50 border border-green-200"
-                  : selectedItem.status === "confirmed"
+              className={`p-3 rounded-lg mb-4 ${selectedItem.status === "completed"
+                ? "bg-green-50 border border-green-200"
+                : selectedItem.status === "confirmed"
                   ? "bg-blue-50 border border-blue-200"
                   : selectedItem.status === "cancelled"
-                  ? "bg-red-50 border border-red-200"
-                  : "bg-yellow-50 border border-yellow-200"
-              }`}
+                    ? "bg-red-50 border border-red-200"
+                    : "bg-yellow-50 border border-yellow-200"
+                }`}
             >
               <div className="flex items-center justify-between">
                 <span
@@ -1548,62 +1544,55 @@ const AdminDashboard = () => {
                 </p>
                 <div className="flex items-center justify-center gap-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      [
-                        "pending",
-                        "contacted",
-                        "confirmed",
-                        "completed",
-                      ].includes(selectedItem.status)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-3 h-3 rounded-full ${[
+                      "pending",
+                      "contacted",
+                      "confirmed",
+                      "completed",
+                    ].includes(selectedItem.status)
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-8 h-0.5 ${
-                      ["contacted", "confirmed", "completed"].includes(
-                        selectedItem.status
-                      )
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-8 h-0.5 ${["contacted", "confirmed", "completed"].includes(
+                      selectedItem.status
+                    )
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      ["contacted", "confirmed", "completed"].includes(
-                        selectedItem.status
-                      )
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-3 h-3 rounded-full ${["contacted", "confirmed", "completed"].includes(
+                      selectedItem.status
+                    )
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-8 h-0.5 ${
-                      ["confirmed", "completed"].includes(selectedItem.status)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-8 h-0.5 ${["confirmed", "completed"].includes(selectedItem.status)
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      ["confirmed", "completed"].includes(selectedItem.status)
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-3 h-3 rounded-full ${["confirmed", "completed"].includes(selectedItem.status)
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-8 h-0.5 ${
-                      selectedItem.status === "completed"
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-8 h-0.5 ${selectedItem.status === "completed"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      selectedItem.status === "completed"
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-3 h-3 rounded-full ${selectedItem.status === "completed"
+                      ? "bg-green-500"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-2 px-2">
@@ -1632,11 +1621,10 @@ const AdminDashboard = () => {
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
-                      selectedUser.role === "admin"
-                        ? "bg-gradient-to-r from-primary to-secondary"
-                        : "bg-gray-400"
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${selectedUser.role === "admin"
+                      ? "bg-gradient-to-r from-primary to-secondary"
+                      : "bg-gray-400"
+                      }`}
                   >
                     {selectedUser.firstName?.charAt(0)}
                     {selectedUser.lastName?.charAt(0)}
@@ -1665,11 +1653,10 @@ const AdminDashboard = () => {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${
-                    userActionMessage.type === "success"
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-red-50 text-red-700 border border-red-200"
-                  }`}
+                  className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${userActionMessage.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
                 >
                   {userActionMessage.type === "success" ? (
                     <FiCheckCircle />
@@ -1730,11 +1717,10 @@ const AdminDashboard = () => {
                         <span className="text-xs uppercase">Role</span>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          selectedUser.role === "admin"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-gray-200 text-gray-700"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${selectedUser.role === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-gray-200 text-gray-700"
+                          }`}
                       >
                         {selectedUser.role}
                       </span>
@@ -1845,11 +1831,10 @@ const AdminDashboard = () => {
                       value={editUserData.role}
                       onChange={handleEditUserChange}
                       disabled={selectedUser._id === currentUser?._id}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
-                        selectedUser._id === currentUser?._id
-                          ? "bg-gray-100 cursor-not-allowed"
-                          : ""
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${selectedUser._id === currentUser?._id
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : ""
+                        }`}
                     >
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
@@ -1989,7 +1974,11 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowCreateAdminModal(false)}
+                  onClick={() => {
+                    setShowCreateAdminModal(false);
+                    setShowAdminPassword(false);
+                    setShowAdminConfirmPassword(false);
+                  }}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <FiX size={20} />
@@ -2008,11 +1997,10 @@ const AdminDashboard = () => {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${
-                    createAdminMessage.type === "success"
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-red-50 text-red-700 border border-red-200"
-                  }`}
+                  className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${createAdminMessage.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
                 >
                   {createAdminMessage.type === "success" ? (
                     <FiCheckCircle />
@@ -2087,28 +2075,46 @@ const AdminDashboard = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <FiLock className="inline mr-1" /> Password
                   </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={createAdminData.password}
-                    onChange={handleCreateAdminChange}
-                    placeholder="Min. 8 characters"
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showAdminPassword ? "text" : "password"}
+                      name="password"
+                      value={createAdminData.password}
+                      onChange={handleCreateAdminChange}
+                      placeholder="Min. 8 characters"
+                      className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showAdminPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <FiLock className="inline mr-1" /> Confirm Password
                   </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={createAdminData.confirmPassword}
-                    onChange={handleCreateAdminChange}
-                    placeholder="Re-enter password"
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showAdminConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={createAdminData.confirmPassword}
+                      onChange={handleCreateAdminChange}
+                      placeholder="Re-enter password"
+                      className="w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminConfirmPassword(!showAdminConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showAdminConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Info Box */}
@@ -2129,7 +2135,11 @@ const AdminDashboard = () => {
                 {/* Buttons */}
                 <div className="flex gap-3 pt-2">
                   <button
-                    onClick={() => setShowCreateAdminModal(false)}
+                    onClick={() => {
+                      setShowCreateAdminModal(false);
+                      setShowAdminPassword(false);
+                      setShowAdminConfirmPassword(false);
+                    }}
                     className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
                   >
                     Cancel

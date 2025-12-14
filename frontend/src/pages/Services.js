@@ -52,7 +52,7 @@ const Services = () => {
         "Transit insurance coverage",
       ],
       price: "Starting from ₹4,999",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: true,
     },
     {
@@ -72,7 +72,7 @@ const Services = () => {
         "Dedicated project manager",
       ],
       price: "Custom Quote",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -91,7 +91,7 @@ const Services = () => {
         "Multi-vehicle discounts",
       ],
       price: "Starting from ₹6,999",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -110,7 +110,7 @@ const Services = () => {
         "Pest-free environment",
       ],
       price: "Starting from ₹999/month",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -129,7 +129,7 @@ const Services = () => {
         "Cultural orientation support",
       ],
       price: "Custom Quote",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -148,7 +148,7 @@ const Services = () => {
         "Unpacking services included",
       ],
       price: "Starting from ₹1,999",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -167,7 +167,7 @@ const Services = () => {
         "24/7 customer support",
       ],
       price: "Starting from ₹7,999",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
     {
@@ -186,7 +186,7 @@ const Services = () => {
         "Debris removal option",
       ],
       price: "Starting from ₹1,499",
-      color: "from-[#A888B5] to-[#8174A0]",
+      color: "from-[#0EA5E9] to-[#06B6D4]",
       popular: false,
     },
   ];

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiMapPin,
@@ -30,8 +31,11 @@ import {
   FaBoxOpen,
 } from "react-icons/fa";
 import { quoteAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const Quote = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -72,6 +76,21 @@ const Quote = () => {
   });
 
   const [estimatedCost, setEstimatedCost] = useState(null);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate("/login", { replace: true });
+    } else {
+      // Pre-fill user's name and email if logged in
+      setFormData((prev) => ({
+        ...prev,
+        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user, navigate]);
 
   const steps = [
     { number: 1, title: "Location", icon: FiMapPin },
@@ -218,7 +237,7 @@ const Quote = () => {
         toAddress: formData.toAddress?.trim() || "",
         floorFrom: parseInt(formData.fromFloor) || 0,
         floorTo: parseInt(formData.toFloor) || 0,
-        moveDate: formData.moveDate,
+        moveDate: new Date(formData.moveDate).toISOString(), // Convert to ISO8601
         moveType: formData.moveType,
         propertyType: formData.propertySize || "other",
         items: formData.items,
@@ -229,9 +248,13 @@ const Quote = () => {
       console.log("Submitting quote:", quoteData);
       const response = await quoteAPI.create(quoteData);
 
+      console.log("Quote creation response:", response.data);
+
       if (response.data.success) {
         setQuoteId(response.data.data.quoteId);
         setSubmitSuccess(true);
+      } else {
+        setSubmitError("Quote submission failed. Please try again.");
       }
     } catch (err) {
       console.error("Quote submission error:", err);
@@ -308,10 +331,10 @@ const Quote = () => {
                         {n === 1
                           ? "st"
                           : n === 2
-                          ? "nd"
-                          : n === 3
-                          ? "rd"
-                          : "th"}{" "}
+                            ? "nd"
+                            : n === 3
+                              ? "rd"
+                              : "th"}{" "}
                         Floor
                       </option>
                     ))}
@@ -376,10 +399,10 @@ const Quote = () => {
                         {n === 1
                           ? "st"
                           : n === 2
-                          ? "nd"
-                          : n === 3
-                          ? "rd"
-                          : "th"}{" "}
+                            ? "nd"
+                            : n === 3
+                              ? "rd"
+                              : "th"}{" "}
                         Floor
                       </option>
                     ))}
@@ -445,25 +468,22 @@ const Quote = () => {
                     onClick={() =>
                       setFormData((prev) => ({ ...prev, moveType: type.value }))
                     }
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      formData.moveType === type.value
-                        ? "border-primary bg-primary/5"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.moveType === type.value
+                      ? "border-primary bg-primary/5"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                   >
                     <type.icon
-                      className={`text-2xl mb-2 ${
-                        formData.moveType === type.value
-                          ? "text-primary"
-                          : "text-gray-400"
-                      }`}
+                      className={`text-2xl mb-2 ${formData.moveType === type.value
+                        ? "text-primary"
+                        : "text-gray-400"
+                        }`}
                     />
                     <p
-                      className={`font-medium text-sm ${
-                        formData.moveType === type.value
-                          ? "text-primary"
-                          : "text-gray-700"
-                      }`}
+                      className={`font-medium text-sm ${formData.moveType === type.value
+                        ? "text-primary"
+                        : "text-gray-700"
+                        }`}
                     >
                       {type.label}
                     </p>
@@ -487,18 +507,16 @@ const Quote = () => {
                         propertySize: size.value,
                       }))
                     }
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      formData.propertySize === size.value
-                        ? "border-primary bg-primary/5"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.propertySize === size.value
+                      ? "border-primary bg-primary/5"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
                   >
                     <p
-                      className={`font-semibold ${
-                        formData.propertySize === size.value
-                          ? "text-primary"
-                          : "text-gray-700"
-                      }`}
+                      className={`font-semibold ${formData.propertySize === size.value
+                        ? "text-primary"
+                        : "text-gray-700"
+                        }`}
                     >
                       {size.label}
                     </p>
@@ -705,25 +723,22 @@ const Quote = () => {
                         paymentMethod: method.value,
                       }))
                     }
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
-                      formData.paymentMethod === method.value
-                        ? "border-primary bg-primary/5 shadow-md"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${formData.paymentMethod === method.value
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                      }`}
                   >
                     <method.icon
-                      className={`text-2xl mx-auto mb-2 ${
-                        formData.paymentMethod === method.value
-                          ? "text-primary"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-2xl mx-auto mb-2 ${formData.paymentMethod === method.value
+                        ? "text-primary"
+                        : "text-gray-500"
+                        }`}
                     />
                     <p
-                      className={`font-semibold text-sm ${
-                        formData.paymentMethod === method.value
-                          ? "text-primary"
-                          : "text-gray-700"
-                      }`}
+                      className={`font-semibold text-sm ${formData.paymentMethod === method.value
+                        ? "text-primary"
+                        : "text-gray-700"
+                        }`}
                     >
                       {method.label}
                     </p>
@@ -855,12 +870,12 @@ const Quote = () => {
               >
                 Submit Another
               </button>
-              <a
-                href="/dashboard"
+              <button
+                onClick={() => navigate("/dashboard", { replace: true })}
                 className="flex-1 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-secondary transition-colors"
               >
                 Go to Dashboard
-              </a>
+              </button>
             </div>
           </motion.div>
         </motion.div>
@@ -894,11 +909,10 @@ const Quote = () => {
                 <React.Fragment key={step.number}>
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                        currentStep >= step.number
-                          ? "bg-primary text-white"
-                          : "bg-gray-200 text-gray-500"
-                      }`}
+                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${currentStep >= step.number
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-500"
+                        }`}
                     >
                       {currentStep > step.number ? (
                         <FiCheck className="text-xl" />
@@ -907,20 +921,18 @@ const Quote = () => {
                       )}
                     </div>
                     <span
-                      className={`text-sm mt-2 font-medium ${
-                        currentStep >= step.number
-                          ? "text-primary"
-                          : "text-gray-500"
-                      }`}
+                      className={`text-sm mt-2 font-medium ${currentStep >= step.number
+                        ? "text-primary"
+                        : "text-gray-500"
+                        }`}
                     >
                       {step.title}
                     </span>
                   </div>
                   {idx < steps.length - 1 && (
                     <div
-                      className={`flex-1 h-1 mx-4 rounded ${
-                        currentStep > step.number ? "bg-primary" : "bg-gray-200"
-                      }`}
+                      className={`flex-1 h-1 mx-4 rounded ${currentStep > step.number ? "bg-primary" : "bg-gray-200"
+                        }`}
                     />
                   )}
                 </React.Fragment>
@@ -946,11 +958,10 @@ const Quote = () => {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all ${
-                    currentStep === 1
-                      ? "invisible"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className={`flex items-center px-6 py-3 rounded-lg font-semibold transition-all ${currentStep === 1
+                    ? "invisible"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                 >
                   <FiArrowLeft className="mr-2" /> Previous
                 </button>

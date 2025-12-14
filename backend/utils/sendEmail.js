@@ -1,31 +1,44 @@
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
-  // Create transporter
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  try {
+    // Validate required environment variables
+    if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      throw new Error("Email configuration is missing. Please check environment variables.");
+    }
 
-  // Email options
-  const mailOptions = {
-    from: `UnitedPackers <${process.env.EMAIL_FROM}>`,
-    to: options.to,
-    subject: options.subject,
-    text: options.text,
-    html: options.html,
-  };
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  // Send email
-  const info = await transporter.sendMail(mailOptions);
+    // Verify transporter connection
+    await transporter.verify();
 
-  console.log(`📧 Email sent: ${info.messageId}`);
-  return info;
+    // Email options
+    const mailOptions = {
+      from: `UnitedPackers <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+      to: options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+    };
+
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`✅ Email sent successfully to ${options.to}: ${info.messageId}`);
+    return info;
+  } catch (error) {
+    console.error(`❌ Email sending failed:`, error.message);
+    throw error;
+  }
 };
 
 // Email templates
@@ -79,15 +92,14 @@ const emailTemplates = {
             <p><strong>From:</strong> ${data.fromCity}</p>
             <p><strong>To:</strong> ${data.toCity}</p>
             <p style="font-size: 24px; color: #3B0A45;"><strong>Estimated Cost: ₹${data.estimatedCost.toLocaleString(
-              "en-IN"
-            )}</strong></p>
+      "en-IN"
+    )}</strong></p>
           </div>
           <p>This quote is valid for 7 days. To proceed with the booking or discuss the quote, please contact us:</p>
           <p>📞 Phone: +91 98765 43210</p>
           <p>📧 Email: info@unitedpackers.in</p>
-          <a href="${process.env.CLIENT_URL}/quote/track/${
-      data.quoteId
-    }" style="display: inline-block; background: #3B0A45; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px;">Track Your Quote</a>
+          <a href="${process.env.CLIENT_URL}/quote/track/${data.quoteId
+      }" style="display: inline-block; background: #3B0A45; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px;">Track Your Quote</a>
         </div>
       </div>
     `,

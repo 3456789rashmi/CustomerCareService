@@ -111,8 +111,34 @@ const quoteSchema = new mongoose.Schema(
 
     // Items & Services
     items: {
-      type: String,
-      trim: true,
+      beds: {
+        type: Number,
+        default: 0,
+      },
+      sofas: {
+        type: Number,
+        default: 0,
+      },
+      tables: {
+        type: Number,
+        default: 0,
+      },
+      chairs: {
+        type: Number,
+        default: 0,
+      },
+      tvs: {
+        type: Number,
+        default: 0,
+      },
+      appliances: {
+        type: Number,
+        default: 0,
+      },
+      boxes: {
+        type: Number,
+        default: 0,
+      },
     },
     packingRequired: {
       type: Boolean,
@@ -213,6 +239,7 @@ quoteSchema.index({ email: 1 });
 quoteSchema.index({ phone: 1 });
 quoteSchema.index({ status: 1 });
 quoteSchema.index({ createdAt: -1 });
+quoteSchema.index({ user: 1, quoteId: 1 }); // For user quote lookups
 // quoteId index is already created by unique: true
 
 module.exports = mongoose.model("Quote", quoteSchema);

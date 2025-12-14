@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     try {
       setError(null);
       const response = await authAPI.login({ email, password });
@@ -68,6 +68,16 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(data));
+
+      // Handle "Remember Me" - store email and remember flag
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
+        localStorage.setItem("rememberEmail", email);
+      } else {
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("rememberEmail");
+      }
+
       setUser(data);
 
       return { success: true, data, user: data };

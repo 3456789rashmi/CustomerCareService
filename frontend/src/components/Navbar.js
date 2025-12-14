@@ -11,7 +11,6 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import {
-  FaTruck,
   FaHome,
   FaBuilding,
   FaCar,
@@ -150,7 +149,7 @@ const Navbar = () => {
     quickLinks: [
       { label: "View All Services", path: "/services" },
       { label: "Get Free Quote", path: "/quote" },
-      { label: "Track Shipment", path: "/quote" },
+      { label: "Track Shipment", path: "/track-shipment" },
     ],
   };
 
@@ -210,9 +209,8 @@ const Navbar = () => {
 
       {/* Main Navbar */}
       <nav
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-lg" : "bg-white shadow-md"
-        }`}
+        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-lg" : "bg-white shadow-md"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
@@ -245,11 +243,10 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`font-medium transition-colors duration-200 ${
-                    isActive(link.path)
-                      ? "text-primary border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary"
-                  }`}
+                  className={`font-medium transition-colors duration-200 ${isActive(link.path)
+                    ? "text-primary border-b-2 border-primary pb-1"
+                    : "text-gray-700 hover:text-primary"
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -264,9 +261,8 @@ const Navbar = () => {
                 <button className="flex items-center font-medium text-gray-700 hover:text-primary transition-colors">
                   Services{" "}
                   <FiChevronDown
-                    className={`ml-1 transition-transform ${
-                      showServicesDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`ml-1 transition-transform ${showServicesDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -344,9 +340,8 @@ const Navbar = () => {
                 <button className="flex items-center font-medium text-gray-700 hover:text-primary transition-colors">
                   More{" "}
                   <FiChevronDown
-                    className={`ml-1 transition-transform ${
-                      showMoreDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`ml-1 transition-transform ${showMoreDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -413,11 +408,10 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`font-medium transition-colors duration-200 ${
-                    isActive(link.path)
-                      ? "text-primary border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary"
-                  }`}
+                  className={`font-medium transition-colors duration-200 ${isActive(link.path)
+                    ? "text-primary border-b-2 border-primary pb-1"
+                    : "text-gray-700 hover:text-primary"
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -434,9 +428,8 @@ const Navbar = () => {
                     <FiUser className="w-4 h-4 mr-2" />
                     {user?.firstName}
                     <FiChevronDown
-                      className={`ml-2 transition-transform ${
-                        showUserDropdown ? "rotate-180" : ""
-                      }`}
+                      className={`ml-2 transition-transform ${showUserDropdown ? "rotate-180" : ""
+                        }`}
                     />
                   </button>
 
@@ -532,11 +525,10 @@ const Navbar = () => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`font-medium px-4 py-2 rounded-lg transition-colors ${
-                      isActive(link.path)
-                        ? "bg-primary text-white"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                    className={`font-medium px-4 py-2 rounded-lg transition-colors ${isActive(link.path)
+                      ? "bg-primary text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
                   >
                     {link.label}
                   </Link>

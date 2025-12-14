@@ -19,6 +19,10 @@ Thumbs.db
 
 # Build output
 dist/
+
+# Uploads
+uploads/
+dist/
 build/
 
 # Coverage

@@ -1,6 +1,14 @@
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const UPLOAD_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
+
+// Helper function to construct full avatar URL
+export const getAvatarUrl = (avatarPath) => {
+  if (!avatarPath) return null;
+  if (avatarPath.startsWith("http")) return avatarPath;
+  return `${UPLOAD_URL}${avatarPath}`;
+};
 
 // Create axios instance
 const api = axios.create({
@@ -16,6 +24,13 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Only set Content-Type for non-FormData requests
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    } else {
+      // For FormData, delete Content-Type to let browser set it with boundary
+      delete config.headers["Content-Type"];
     }
     return config;
   },
@@ -57,6 +72,7 @@ export const quoteAPI = {
   getQuoteDetail: (id) => api.get(`/users/quotes/${id}`),
   cancelQuote: (id) => api.put(`/users/quotes/${id}/cancel`),
   acceptQuote: (id) => api.put(`/users/quotes/${id}/accept`),
+  claimQuotes: () => api.post("/quotes/claim"),
 };
 
 // Enquiry APIs
@@ -75,6 +91,7 @@ export const userAPI = {
   getDashboard: () => api.get("/users/dashboard"),
   getProfile: () => api.get("/users/profile"),
   updateProfile: (data) => api.put("/users/profile", data),
+  deleteAccount: () => api.delete("/users/account"),
 };
 
 // Admin APIs

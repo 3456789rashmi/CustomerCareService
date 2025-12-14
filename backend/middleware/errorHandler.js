@@ -17,9 +17,8 @@ const errorHandler = (err, req, res, next) => {
   // Mongoose duplicate key
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue)[0];
-    const message = `${
-      field.charAt(0).toUpperCase() + field.slice(1)
-    } already exists`;
+    const message = `${field.charAt(0).toUpperCase() + field.slice(1)
+      } already exists`;
     error = { message, statusCode: 400 };
   }
 
@@ -36,6 +35,19 @@ const errorHandler = (err, req, res, next) => {
 
   if (err.name === "TokenExpiredError") {
     error = { message: "Token expired", statusCode: 401 };
+  }
+
+  // Multer errors
+  if (err.code === "LIMIT_FILE_SIZE") {
+    error = { message: "File size exceeds maximum limit of 5MB", statusCode: 400 };
+  }
+
+  if (err.code === "FILE_TOO_LARGE") {
+    error = { message: "File size exceeds maximum limit of 5MB", statusCode: 400 };
+  }
+
+  if (err.code === "INVALID_FILE_TYPE") {
+    error = { message: err.message || "Invalid file type", statusCode: 400 };
   }
 
   res.status(error.statusCode || 500).json({

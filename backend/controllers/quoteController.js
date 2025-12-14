@@ -33,6 +33,8 @@ exports.createQuote = async (req, res) => {
       paymentMethod,
     } = req.body;
 
+    console.log("Creating quote for user:", req.user?.id, "Email:", email);
+
     // Create quote
     const quote = await Quote.create({
       name,
@@ -61,6 +63,8 @@ exports.createQuote = async (req, res) => {
       paymentMethod,
       user: req.user ? req.user.id : null,
     });
+
+    console.log("Quote created:", quote._id, "Quote ID:", quote.quoteId, "User ID:", quote.user);
 
     // Send confirmation email
     try {
@@ -398,6 +402,47 @@ exports.getQuoteStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch statistics",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Claim unassigned quotes by email (link quotes to user account)
+// @route   POST /api/quotes/claim
+// @access  Private
+exports.claimQuotes = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    console.log("Claiming quotes for email:", userEmail);
+
+    // Find all quotes with matching email that don't have a user assigned
+    const claimedQuotes = await Quote.updateMany(
+      {
+        email: userEmail,
+        $or: [
+          { user: { $exists: false } },
+          { user: null }
+        ]
+      },
+      { user: userId }
+    );
+
+    console.log("Claimed quotes:", claimedQuotes.modifiedCount);
+
+    res.status(200).json({
+      success: true,
+      message: `Claimed ${claimedQuotes.modifiedCount} quotes`,
+      data: {
+        claimedCount: claimedQuotes.modifiedCount,
+      },
+    });
+  } catch (error) {
+    console.error("Claim quotes error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to claim quotes",
       error: error.message,
     });
   }

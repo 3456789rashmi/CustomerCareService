@@ -74,6 +74,16 @@ const AdminDashboard = () => {
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showAdminConfirmPassword, setShowAdminConfirmPassword] = useState(false);
 
+  // Enquiry Response Modal states
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [selectedEnquiry, setSelectedEnquiry] = useState(null);
+  const [enquiryResponse, setEnquiryResponse] = useState("");
+  const [enquiryModalLoading, setEnquiryModalLoading] = useState(false);
+  const [enquiryModalMessage, setEnquiryModalMessage] = useState({
+    type: "",
+    message: "",
+  });
+
   // Real-time updates state
   const [isLiveUpdating, setIsLiveUpdating] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
@@ -292,6 +302,54 @@ const AdminDashboard = () => {
       fetchDashboardData();
     } catch (err) {
       console.error("Failed to update enquiry:", err);
+    }
+  };
+
+  const openEnquiryModal = (enquiry) => {
+    setSelectedEnquiry(enquiry);
+    setEnquiryResponse(enquiry.response || "");
+    setEnquiryModalMessage({ type: "", message: "" });
+    setShowEnquiryModal(true);
+  };
+
+  const closeEnquiryModal = () => {
+    setShowEnquiryModal(false);
+    setSelectedEnquiry(null);
+    setEnquiryResponse("");
+    setEnquiryModalMessage({ type: "", message: "" });
+  };
+
+  const handleSubmitEnquiryResponse = async () => {
+    if (!enquiryResponse.trim()) {
+      setEnquiryModalMessage({
+        type: "error",
+        message: "Please enter a response message",
+      });
+      return;
+    }
+
+    setEnquiryModalLoading(true);
+    try {
+      await adminAPI.updateEnquiry(selectedEnquiry._id, {
+        response: enquiryResponse,
+        status: "responded",
+      });
+      setEnquiryModalMessage({
+        type: "success",
+        message: "Response sent successfully!",
+      });
+      setTimeout(() => {
+        closeEnquiryModal();
+        fetchEnquiries();
+        fetchDashboardData();
+      }, 1500);
+    } catch (err) {
+      setEnquiryModalMessage({
+        type: "error",
+        message: err.response?.data?.message || "Failed to send response",
+      });
+    } finally {
+      setEnquiryModalLoading(false);
     }
   };
 
@@ -992,6 +1050,13 @@ const AdminDashboard = () => {
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => openEnquiryModal(enquiry)}
+                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+                              title="Send Response"
+                            >
+                              Reply
+                            </button>
                             <select
                               value={enquiry.status}
                               onChange={(e) =>
@@ -1002,8 +1067,10 @@ const AdminDashboard = () => {
                               )}`}
                             >
                               <option value="new">New</option>
-                              <option value="contacted">Contacted</option>
+                              <option value="in-progress">In Progress</option>
+                              <option value="responded">Responded</option>
                               <option value="resolved">Resolved</option>
+                              <option value="closed">Closed</option>
                             </select>
                             <button
                               onClick={() => deleteEnquiry(enquiry._id)}
@@ -2154,6 +2221,120 @@ const AdminDashboard = () => {
                     ) : (
                       <>
                         <FiUserPlus /> Create Admin
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Enquiry Response Modal */}
+      <AnimatePresence>
+        {showEnquiryModal && selectedEnquiry && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              {/* Modal Header */}
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">
+                    Respond to Enquiry
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    From: {selectedEnquiry.name} ({selectedEnquiry.email})
+                  </p>
+                </div>
+                <button
+                  onClick={closeEnquiryModal}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+
+              {/* Action Message */}
+              {enquiryModalMessage.message && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${enquiryModalMessage.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
+                >
+                  {enquiryModalMessage.type === "success" ? (
+                    <FiCheckCircle />
+                  ) : (
+                    <FiAlertCircle />
+                  )}
+                  {enquiryModalMessage.message}
+                </motion.div>
+              )}
+
+              {/* Enquiry Details */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Subject
+                    </p>
+                    <p className="text-gray-800 font-medium">
+                      {selectedEnquiry.subject}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Customer Message
+                    </p>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {selectedEnquiry.message}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Response Form */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
+                    Your Response *
+                  </label>
+                  <textarea
+                    value={enquiryResponse}
+                    onChange={(e) => setEnquiryResponse(e.target.value)}
+                    placeholder="Write your response message here..."
+                    className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-primary text-gray-700 min-h-[150px] resize-vertical"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    The customer will receive this response via email
+                  </p>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={closeEnquiryModal}
+                    className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitEnquiryResponse}
+                    disabled={enquiryModalLoading}
+                    className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {enquiryModalLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <FiCheck /> Send Response
                       </>
                     )}
                   </button>

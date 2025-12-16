@@ -11,6 +11,7 @@ const {
   updateQuote,
   getMyQuotes,
   deleteQuote,
+  deleteUserQuote,
   getQuoteStats,
   claimQuotes,
 } = require("../controllers/quoteController");
@@ -74,6 +75,9 @@ router.get("/my-quotes", protect, getMyQuotes);
 
 // @route   GET /api/quotes/:id - Get single quote
 router.get("/:id", protect, getQuote);
+
+// @route   DELETE /api/quotes/:id/user - Delete user's own quote
+router.delete("/:id/user", protect, deleteUserQuote);
 
 // Admin routes
 // @route   GET /api/quotes - Get all quotes

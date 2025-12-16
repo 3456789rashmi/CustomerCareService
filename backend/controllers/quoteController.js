@@ -361,6 +361,77 @@ exports.deleteQuote = async (req, res) => {
   }
 };
 
+// @desc    Delete user's own quote (only if pending or reviewing)
+// @route   DELETE /api/quotes/:id/user
+// @access  Private/User
+exports.deleteUserQuote = async (req, res) => {
+  try {
+    const quote = await Quote.findById(req.params.id);
+
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        message: "Quote not found",
+      });
+    }
+
+    // Check if quote belongs to user
+    if (quote.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this quote",
+      });
+    }
+
+    // Check if quote can be deleted (only pending and reviewing statuses)
+    const deletableStatuses = ["pending", "reviewing"];
+    if (!deletableStatuses.includes(quote.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete quote with status '${quote.status}'. Quotes can only be deleted when pending or under review.`,
+      });
+    }
+
+    // Store quote details before deletion for email
+    const quoteData = {
+      quoteId: quote.quoteId,
+      name: quote.name,
+      fromCity: quote.fromCity,
+      toCity: quote.toCity,
+      deletedDate: new Date().toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    };
+
+    await quote.deleteOne();
+
+    // Send deletion confirmation email
+    try {
+      await sendEmail({
+        to: quote.email,
+        ...emailTemplates.quoteDeletion(quoteData),
+      });
+      console.log(`✅ Deletion confirmation email sent to ${quote.email}`);
+    } catch (emailError) {
+      console.error("Failed to send deletion confirmation email:", emailError.message);
+      // Continue with response even if email fails
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Quote deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete quote",
+      error: error.message,
+    });
+  }
+};
+
 // @desc    Get quote statistics (Admin)
 // @route   GET /api/quotes/stats
 // @access  Private/Admin

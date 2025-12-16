@@ -50,9 +50,9 @@ const Enquiry = () => {
     },
     {
       id: 3,
-      question: "What if I need to cancel?",
+      question: "Can I delete or cancel my quote?",
       answer:
-        "We understand plans can change. Here's our cancellation policy:\n\n• Cancel before pickup: Full refund\n• Cancel after pickup: Charges as per agreement\n• Partial cancellation: Possible with modified quote\n\nPlease note:\n• Contact us ASAP for cancellations\n• Cancellations must be requested within 24 hours\n• A small administrative fee may apply\n\nReach out to our support team at +91 98765 43210 for cancellation requests.",
+        "Yes! You have the flexibility to manage your quotes:\n\n🗑️ DELETE QUOTE (Before it's quoted):\n• You can delete quotes while they're 'Pending' or 'Under Review'\n• Once a quote is marked as 'Quote Ready', it cannot be deleted\n• To delete: Visit your quote tracking page and click the Delete button\n• Deletion is permanent and cannot be undone\n\n❌ CANCEL QUOTE (After quote is provided):\n• For quotes that are quoted or accepted, you can request cancellation\n• Contact us at +91 98765 43210 for cancellation requests\n• Cancellation charges may apply depending on status\n• Refund policy varies based on when cancellation is requested\n\n⚡ Quick Tips:\n• Delete early if you change your mind (free & instant)\n• Contact support for quotes beyond the 'Under Review' stage\n• All cancellations must be confirmed with our team",
     },
     {
       id: 4,
@@ -239,8 +239,8 @@ const Enquiry = () => {
                     >
                       <div
                         className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg whitespace-pre-line ${msg.type === "user"
-                            ? "bg-primary text-white rounded-br-none"
-                            : "bg-gray-100 text-gray-800 rounded-bl-none"
+                          ? "bg-primary text-white rounded-br-none"
+                          : "bg-gray-100 text-gray-800 rounded-bl-none"
                           }`}
                       >
                         {msg.text}
@@ -399,8 +399,8 @@ const Enquiry = () => {
                       whileHover={{ x: 5 }}
                       onClick={() => handleQuestionClick(qa)}
                       className={`w-full text-left px-4 py-3 rounded-lg transition-all text-sm font-medium ${selectedQuestion === qa.id
-                          ? "bg-primary text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                     >
                       {qa.question}

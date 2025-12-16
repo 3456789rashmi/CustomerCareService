@@ -145,6 +145,38 @@ const emailTemplates = {
       </div>
     `,
   }),
+
+  // Quote deletion confirmation email
+  quoteDeletion: (data) => ({
+    subject: `Quote Deletion Confirmed - #${data.quoteId}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #3B0A45, #5E4F82); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">UnitedPackers</h1>
+        </div>
+        <div style="padding: 30px;">
+          <h2 style="color: #3B0A45;">Quote Deletion Confirmed</h2>
+          <p>Dear ${data.name},</p>
+          <p>Your quote has been successfully deleted from your account.</p>
+          
+          <div style="background: #f5f5f5; padding: 20px; border-left: 4px solid #EF4444; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #3B0A45;">Quote Details</h3>
+            <p><strong>Quote ID:</strong> #${data.quoteId}</p>
+            <p><strong>From:</strong> ${data.fromCity}</p>
+            <p><strong>To:</strong> ${data.toCity}</p>
+            <p><strong>Deleted on:</strong> ${data.deletedDate}</p>
+          </div>
+
+          <p>If you need to request a new quote, please visit:</p>
+          <a href="${process.env.CLIENT_URL}/quote" style="display: inline-block; background: #3B0A45; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Request a New Quote</a>
+
+          <p style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 14px; color: #666;">
+            If you have any questions, please contact us at <strong>support@unitedpackers.in</strong>
+          </p>
+        </div>
+      </div>
+    `,
+  }),
 };
 
 module.exports = { sendEmail, emailTemplates };

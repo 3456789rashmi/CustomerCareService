@@ -15,9 +15,11 @@ import {
   FiTruck,
   FiUpload,
   FiTrash2,
+  FiStar,
+  FiPhone,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
-import { userAPI, quoteAPI, enquiryAPI, getAvatarUrl } from "../services/api";
+import { userAPI, quoteAPI, enquiryAPI, feedbackAPI, getAvatarUrl } from "../services/api";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [quotes, setQuotes] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [profileImage, setProfileImage] = useState(getAvatarUrl(user?.avatar) || null);
@@ -103,11 +106,20 @@ const Dashboard = () => {
       // Fetch enquiries
       try {
         const enquiriesRes = await enquiryAPI.getMyEnquiries();
-        console.log("Enquiries data:", enquiriesRes.data.data);
         setEnquiries(enquiriesRes.data.data || []);
       } catch (enquiryError) {
         console.log("Error fetching enquiries:", enquiryError.message);
         setEnquiries([]);
+      }
+
+      // Fetch feedbacks
+      try {
+        const feedbacksRes = await feedbackAPI.getMyFeedbacks();
+        console.log("Feedbacks data:", feedbacksRes.data.data);
+        setFeedbacks(feedbacksRes.data.data || []);
+      } catch (feedbackError) {
+        console.log("Error fetching feedbacks:", feedbackError.message);
+        setFeedbacks([]);
       }
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
@@ -274,6 +286,7 @@ const Dashboard = () => {
     { id: "overview", label: "Overview", icon: FiPackage },
     { id: "quotes", label: "My Quotes", icon: FiFileText },
     { id: "enquiries", label: "My Enquiries", icon: FiFileText },
+    { id: "feedbacks", label: "My Feedbacks", icon: FiStar },
     { id: "profile", label: "Profile Settings", icon: FiSettings },
   ];
 
@@ -519,13 +532,13 @@ const Dashboard = () => {
                     Under Review
                   </button>
                   <button
-                    onClick={() => setQuoteStatusFilter("quoted")}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${quoteStatusFilter === "quoted"
-                      ? "bg-purple-500 text-white"
+                    onClick={() => setQuoteStatusFilter("cancelled")}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${quoteStatusFilter === "cancelled"
+                      ? "bg-red-500 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                   >
-                    Quoted
+                    Cancelled
                   </button>
                   <button
                     onClick={() => setQuoteStatusFilter("accepted")}
@@ -552,12 +565,13 @@ const Dashboard = () => {
                     {filteredQuotes.map((quote) => (
                       <motion.div
                         key={quote._id}
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => navigate(`/quote-tracking/${quote.quoteId}`)}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer"
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all"
                       >
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div>
+                          <div
+                            className="flex-1 cursor-pointer"
+                            onClick={() => navigate(`/quote-tracking/${quote.quoteId}`)}
+                          >
                             <div className="flex items-center gap-2">
                               <p className="font-bold text-gray-800">
                                 {quote.quoteId}
@@ -581,19 +595,21 @@ const Dashboard = () => {
                               </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            {quote.finalCost ? (
-                              <p className="text-2xl font-bold text-primary">
-                                ₹{quote.finalCost.toLocaleString()}
+                          <div className="flex flex-col items-end gap-4">
+                            <div className="text-right">
+                              {quote.finalCost ? (
+                                <p className="text-2xl font-bold text-primary">
+                                  ₹{quote.finalCost.toLocaleString()}
+                                </p>
+                              ) : quote.estimatedCost ? (
+                                <p className="text-lg text-gray-600">
+                                  Est. ₹{quote.estimatedCost.toLocaleString()}
+                                </p>
+                              ) : null}
+                              <p className="text-sm text-gray-500">
+                                Created: {formatDate(quote.createdAt)}
                               </p>
-                            ) : quote.estimatedCost ? (
-                              <p className="text-lg text-gray-600">
-                                Est. ₹{quote.estimatedCost.toLocaleString()}
-                              </p>
-                            ) : null}
-                            <p className="text-sm text-gray-500">
-                              Created: {formatDate(quote.createdAt)}
-                            </p>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -648,10 +664,10 @@ const Dashboard = () => {
                           </div>
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold ${enquiry.status === "resolved"
-                                ? "bg-green-100 text-green-800"
-                                : enquiry.status === "in-progress"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-yellow-100 text-yellow-800"
+                              ? "bg-green-100 text-green-800"
+                              : enquiry.status === "in-progress"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
                               }`}
                           >
                             {enquiry.status?.charAt(0).toUpperCase() + enquiry.status?.slice(1) || "New"}
@@ -661,6 +677,27 @@ const Dashboard = () => {
                         <p className="text-gray-700 mb-3">
                           {enquiry.message}
                         </p>
+
+                        {/* Admin Response - Show when responded or resolved */}
+                        {(enquiry.status === "responded" || enquiry.status === "resolved") && enquiry.response && (
+                          <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                            <p className="text-sm font-semibold text-green-900 mb-2">✅ Response from UnitedPackers:</p>
+                            <p className="text-gray-700 text-sm mb-3">
+                              {enquiry.response}
+                            </p>
+                            <div className="bg-white p-3 rounded border border-green-200 mt-3">
+                              <p className="text-xs text-gray-600 mb-2 font-medium">If you're not satisfied or have further questions:</p>
+                              <a
+                                href="tel:+919876543210"
+                                className="text-sm font-semibold text-primary hover:text-secondary transition-colors flex items-center gap-2"
+                              >
+                                <FiPhone className="w-4 h-4" />
+                                Call us: +91 9876-543-210
+                              </a>
+                              <p className="text-xs text-gray-500 mt-2">Available Monday - Saturday, 9 AM - 6 PM IST</p>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
@@ -707,6 +744,98 @@ const Dashboard = () => {
                     >
                       Submit an Enquiry
                     </Link>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* Feedbacks Tab */}
+            {activeTab === "feedbacks" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-xl shadow-lg p-6"
+              >
+                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                  <FiStar className="text-yellow-500" />
+                  My Feedbacks
+                </h3>
+                {feedbacks && feedbacks.length > 0 ? (
+                  <div className="space-y-4">
+                    {feedbacks.map((feedback) => {
+                      const quote = feedback.quoteId;
+                      return (
+                        <motion.div
+                          key={feedback._id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <p className="font-semibold text-gray-800">
+                                Quote #{quote?.quoteId || "N/A"}
+                              </p>
+                              <p className="text-sm text-gray-500 mt-1">
+                                {quote?.fromCity} → {quote?.toCity}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="flex items-center gap-1 justify-end mb-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <FiStar
+                                    key={star}
+                                    className={`w-4 h-4 ${feedback.rating >= star
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-gray-300"
+                                      }`}
+                                  />
+                                ))}
+                              </div>
+                              <p className="text-sm font-medium text-gray-700">
+                                {feedback.rating}/5
+                              </p>
+                            </div>
+                          </div>
+
+                          {feedback.comment && (
+                            <p className="text-gray-700 mb-3 bg-gray-50 p-3 rounded-lg italic">
+                              "{feedback.comment}"
+                            </p>
+                          )}
+
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <p className="text-gray-500 text-xs">Submitted</p>
+                              <p className="text-gray-800 font-medium">
+                                {new Date(feedback.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs">Move Type</p>
+                              <p className="text-gray-800 font-medium capitalize">
+                                {quote?.moveType || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs">Quote Status</p>
+                              <p className={`text-gray-800 font-medium capitalize px-2 py-1 rounded text-xs w-fit ${quote?.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                                }`}>
+                                {quote?.status || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <FiStar className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">No feedbacks submitted yet</p>
+                    <p className="text-sm mt-2">Submit feedback for completed quotes to see them here</p>
                   </div>
                 )}
               </motion.div>

@@ -7,7 +7,6 @@ import {
   FiPackage,
   FiUser,
   FiPhone,
-  FiMail,
   FiCheck,
   FiArrowRight,
   FiArrowLeft,
@@ -18,9 +17,6 @@ import {
   FiClock,
   FiCheckCircle,
   FiAlertCircle,
-  FiCreditCard,
-  FiSmartphone,
-  FiDollarSign,
 } from "react-icons/fi";
 import {
   FaTruck,
@@ -71,11 +67,10 @@ const Quote = () => {
     alternatePhone: "",
     preferredTime: "",
     specialInstructions: "",
-    // Payment Preference
-    paymentMethod: "",
   });
 
   const [estimatedCost, setEstimatedCost] = useState(null);
+  const [submitClicked, setSubmitClicked] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -116,13 +111,7 @@ const Quote = () => {
     { value: "other", label: "Other", desc: "Other property type" },
   ];
 
-  const paymentMethods = [
-    { value: "credit_card", label: "Credit Card", icon: FiCreditCard, desc: "Visa, Mastercard, Rupay" },
-    { value: "debit_card", label: "Debit Card", icon: FiCreditCard, desc: "All bank debit cards" },
-    { value: "upi", label: "UPI / Online", icon: FiSmartphone, desc: "GPay, PhonePe, Paytm" },
-    { value: "net_banking", label: "Net Banking", icon: FiDollarSign, desc: "All major banks" },
-    { value: "cash", label: "Cash on Delivery", icon: FiDollarSign, desc: "Pay after service" },
-  ];
+
 
   const inventoryItems = [
     { key: "beds", label: "Beds", icon: FaBed },
@@ -137,6 +126,14 @@ const Quote = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleKeyDown = (e) => {
+    // Prevent form submission when Enter is pressed on input fields
+    // Users must explicitly click the Submit button to submit the quote
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
   };
 
   const handleItemChange = (key, delta) => {
@@ -187,6 +184,35 @@ const Quote = () => {
   };
 
   const nextStep = () => {
+    setSubmitError(""); // Clear previous errors
+    setSubmitClicked(false); // Reset flag when navigating away
+
+    // Validate current step before moving to next
+    if (currentStep === 1) {
+      // Validate location details
+      if (!formData.fromCity || !formData.toCity) {
+        setSubmitError("Please fill in both pickup and delivery cities");
+        return;
+      }
+    } else if (currentStep === 2) {
+      // Validate move details
+      if (!formData.moveDate || !formData.moveType) {
+        setSubmitError("Please select both move date and type of move");
+        return;
+      }
+      if (!formData.propertySize) {
+        setSubmitError("Please select property size");
+        return;
+      }
+    } else if (currentStep === 3) {
+      // Inventory step - no strict validation needed, but calculate estimate
+      if (currentStep < 4) {
+        setCurrentStep((prev) => prev + 1);
+        calculateEstimate();
+      }
+      return;
+    }
+
     if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1);
       if (currentStep === 3) {
@@ -198,15 +224,34 @@ const Quote = () => {
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
+      setSubmitClicked(false); // Reset flag when navigating away
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Only allow submission if the Submit button was explicitly clicked
+    if (!submitClicked) {
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
+      // Debug: Log form data
+      console.log("Form data on submit:", {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        fromCity: formData.fromCity,
+        toCity: formData.toCity,
+        moveDate: formData.moveDate,
+        moveType: formData.moveType,
+        paymentMethod: formData.paymentMethod,
+      });
+
       // Validate required fields
       if (!formData.name || !formData.email || !formData.phone) {
         setSubmitError("Please fill in all contact details");
@@ -219,13 +264,15 @@ const Quote = () => {
         return;
       }
       if (!formData.moveDate || !formData.moveType) {
+        console.log("Move date/type validation failed:", { moveDate: formData.moveDate, moveType: formData.moveType });
         setSubmitError("Please select move date and type");
         setIsSubmitting(false);
         return;
       }
 
+
       // Sanitize phone number - remove spaces, dashes, brackets
-      const sanitizedPhone = formData.phone.trim().replace(/[\s\-\(\)]/g, "");
+      const sanitizedPhone = formData.phone.trim().replace(/[\s()-]/g, "");
 
       const quoteData = {
         name: formData.name.trim(),
@@ -273,6 +320,7 @@ const Quote = () => {
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
+      setSubmitClicked(false); // Reset flag after submission attempt
     }
   };
 
@@ -308,6 +356,7 @@ const Quote = () => {
                     name="fromCity"
                     value={formData.fromCity}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Enter city name"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
@@ -349,6 +398,7 @@ const Quote = () => {
                     name="fromAddress"
                     value={formData.fromAddress}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Enter complete address with landmarks"
                     rows="2"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -376,6 +426,7 @@ const Quote = () => {
                     name="toCity"
                     value={formData.toCity}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Enter city name"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
@@ -417,6 +468,7 @@ const Quote = () => {
                     name="toAddress"
                     value={formData.toAddress}
                     onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Enter complete address with landmarks"
                     rows="2"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -450,6 +502,7 @@ const Quote = () => {
                 name="moveDate"
                 value={formData.moveDate}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 min={new Date().toISOString().split("T")[0]}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 required
@@ -580,6 +633,7 @@ const Quote = () => {
                 name="additionalItems"
                 value={formData.additionalItems}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder="List any additional items like piano, gym equipment, plants, etc."
                 rows="3"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -628,6 +682,7 @@ const Quote = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Enter your full name"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
@@ -642,6 +697,7 @@ const Quote = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Enter your email"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
@@ -656,6 +712,7 @@ const Quote = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Enter phone number"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
@@ -670,6 +727,7 @@ const Quote = () => {
                   name="alternatePhone"
                   value={formData.alternatePhone}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   placeholder="Alternate number (optional)"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
@@ -684,6 +742,7 @@ const Quote = () => {
                 name="preferredTime"
                 value={formData.preferredTime}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Select preferred time</option>
@@ -702,50 +761,11 @@ const Quote = () => {
                 name="specialInstructions"
                 value={formData.specialInstructions}
                 onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Any special requirements or instructions for our team"
                 rows="3"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               />
-            </div>
-
-            {/* Payment Method Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Preferred Payment Method
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                {paymentMethods.map((method) => (
-                  <div
-                    key={method.value}
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        paymentMethod: method.value,
-                      }))
-                    }
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${formData.paymentMethod === method.value
-                      ? "border-primary bg-primary/5 shadow-md"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                      }`}
-                  >
-                    <method.icon
-                      className={`text-2xl mx-auto mb-2 ${formData.paymentMethod === method.value
-                        ? "text-primary"
-                        : "text-gray-500"
-                        }`}
-                    />
-                    <p
-                      className={`font-semibold text-sm ${formData.paymentMethod === method.value
-                        ? "text-primary"
-                        : "text-gray-700"
-                        }`}
-                    >
-                      {method.label}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">{method.desc}</p>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Summary */}
@@ -781,14 +801,6 @@ const Quote = () => {
                       ₹{estimatedCost.toLocaleString()}
                     </span>
                   </div>
-                  {formData.paymentMethod && (
-                    <div className="flex justify-between mt-2">
-                      <span className="text-gray-600">Payment Method:</span>
-                      <span className="font-medium capitalize">
-                        {paymentMethods.find(m => m.value === formData.paymentMethod)?.label || formData.paymentMethod}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -863,6 +875,15 @@ const Quote = () => {
                     preferredTime: "",
                     specialInstructions: "",
                     paymentMethod: "",
+                    cardNumber: "",
+                    cardHolderName: "",
+                    cardExpiry: "",
+                    cardCVV: "",
+                    upiId: "",
+                    bankName: "",
+                    accountHolder: "",
+                    accountNumber: "",
+                    ifscCode: "",
                   });
                   setEstimatedCost(null);
                 }}
@@ -977,6 +998,7 @@ const Quote = () => {
                 ) : (
                   <button
                     type="submit"
+                    onClick={() => setSubmitClicked(true)}
                     disabled={isSubmitting}
                     className="flex items-center bg-green-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >

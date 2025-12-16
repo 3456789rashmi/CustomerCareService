@@ -70,15 +70,24 @@ export const quoteAPI = {
   track: (quoteId) => api.get(`/quotes/track/${quoteId}`),
   getMyQuotes: () => api.get("/users/quotes"),
   getQuoteDetail: (id) => api.get(`/users/quotes/${id}`),
+  deleteQuote: (id) => api.delete(`/quotes/${id}/user`),
   cancelQuote: (id) => api.put(`/users/quotes/${id}/cancel`),
   acceptQuote: (id) => api.put(`/users/quotes/${id}/accept`),
   claimQuotes: () => api.post("/quotes/claim"),
+  submitFeedback: (data) => api.post(`/feedback/${data.quoteId}`, data),
 };
 
 // Enquiry APIs
 export const enquiryAPI = {
   create: (data) => api.post("/enquiries", data),
   getMyEnquiries: () => api.get("/users/enquiries"),
+};
+
+// Feedback APIs
+export const feedbackAPI = {
+  submitFeedback: (data) => api.post(`/feedback/${data.quoteId}`, data),
+  getMyFeedbacks: () => api.get("/feedback/my-feedbacks"),
+  getQuoteFeedback: (quoteId) => api.get(`/feedback/${quoteId}`),
 };
 
 // Contact APIs

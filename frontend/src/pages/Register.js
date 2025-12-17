@@ -162,7 +162,7 @@ const Register = () => {
   const passwordStrength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-navy flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
@@ -181,7 +181,7 @@ const Register = () => {
             <img src="/unitedpackers.png" alt="Logo" className="w-14 h-14" />
             <div>
               <span className="text-2xl font-bold text-white">United</span>
-              <span className="text-2xl font-bold text-light">Packers</span>
+              <span className="text-2xl font-bold text-orange-500">Packers</span>
             </div>
           </Link>
         </div>
@@ -198,19 +198,19 @@ const Register = () => {
             <div className="flex items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step >= 1
-                    ? "bg-primary text-white"
+                    ? "bg-orange-500 text-white"
                     : "bg-gray-200 text-gray-500"
                   }`}
               >
                 {step > 1 ? <FiCheck /> : "1"}
               </div>
               <div
-                className={`w-20 h-1 ${step > 1 ? "bg-primary" : "bg-gray-200"
+                className={`w-20 h-1 ${step > 1 ? "bg-orange-500" : "bg-gray-200"
                   }`}
               ></div>
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step >= 2
-                    ? "bg-primary text-white"
+                    ? "bg-orange-500 text-white"
                     : "bg-gray-200 text-gray-500"
                   }`}
               >
@@ -245,9 +245,9 @@ const Register = () => {
                         value={formData.firstName}
                         onChange={handleChange}
                         className={`w-full pl-12 pr-4 py-3 border ${errors.firstName
-                            ? "border-red-500"
-                            : "border-gray-300"
-                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                          } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                         placeholder="First name"
                       />
                     </div>
@@ -269,7 +269,7 @@ const Register = () => {
                         value={formData.lastName}
                         onChange={handleChange}
                         className={`w-full pl-12 pr-4 py-3 border ${errors.lastName ? "border-red-500" : "border-gray-300"
-                          } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                          } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                         placeholder="Last name"
                       />
                     </div>
@@ -294,7 +294,7 @@ const Register = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       className={`w-full pl-12 pr-4 py-3 border ${errors.phone ? "border-red-500" : "border-gray-300"
-                        } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                        } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                       placeholder="10-digit phone number"
                     />
                   </div>
@@ -307,7 +307,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center mt-6"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center mt-6"
                 >
                   Continue <FiArrowRight className="ml-2" />
                 </button>
@@ -362,7 +362,7 @@ const Register = () => {
                       value={formData.email}
                       onChange={handleChange}
                       className={`w-full pl-12 pr-4 py-3 border ${errors.email ? "border-red-500" : "border-gray-300"
-                        } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                        } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                       placeholder="Enter your email"
                     />
                   </div>
@@ -384,7 +384,7 @@ const Register = () => {
                       value={formData.password}
                       onChange={handleChange}
                       className={`w-full pl-12 pr-12 py-3 border ${errors.password ? "border-red-500" : "border-gray-300"
-                        } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                        } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                       placeholder="Create a strong password"
                     />
                     <button
@@ -403,8 +403,8 @@ const Register = () => {
                           <div
                             key={level}
                             className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
-                                ? passwordStrength.color
-                                : "bg-gray-200"
+                              ? passwordStrength.color
+                              : "bg-gray-200"
                               }`}
                           ></div>
                         ))}
@@ -437,9 +437,9 @@ const Register = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       className={`w-full pl-12 pr-12 py-3 border ${errors.confirmPassword
-                          ? "border-red-500"
-                          : "border-gray-300"
-                        } rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent`}
+                        ? "border-red-500"
+                        : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent`}
                       placeholder="Confirm your password"
                     />
                     <button
@@ -467,20 +467,20 @@ const Register = () => {
                       name="agreeTerms"
                       checked={formData.agreeTerms}
                       onChange={handleChange}
-                      className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary mt-1"
+                      className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500 mt-1"
                     />
                     <span className="ml-2 text-sm text-gray-600">
                       I agree to the{" "}
                       <Link
                         to="/terms"
-                        className="text-primary hover:underline"
+                        className="text-orange-500 hover:underline"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
                         to="/privacy"
-                        className="text-primary hover:underline"
+                        className="text-orange-500 hover:underline"
                       >
                         Privacy Policy
                       </Link>
@@ -505,7 +505,7 @@ const Register = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center"
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center"
                   >
                     {isLoading ? (
                       <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -525,7 +525,7 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-primary hover:text-secondary font-semibold"
+              className="text-orange-500 hover:text-orange-600 font-semibold"
             >
               Sign In
             </Link>

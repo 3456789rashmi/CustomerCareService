@@ -11,7 +11,6 @@ import {
   FiArrowRight,
   FiStar,
   FiMapPin,
-  FiPackage,
   FiUsers,
   FiThumbsUp,
   FiChevronDown,
@@ -46,37 +45,37 @@ const Home = () => {
       icon: FaTruck,
       title: "Household Shifting",
       desc: "Complete home relocation with careful packing and safe transport of your belongings.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
     {
       icon: FaBoxOpen,
       title: "Office Relocation",
       desc: "Minimize business downtime with our efficient corporate moving solutions.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
     {
       icon: FaCar,
       title: "Car Transportation",
       desc: "Safe and secure vehicle shipping to any destination across India.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
     {
       icon: FaWarehouse,
       title: "Warehouse Storage",
       desc: "Secure storage facilities for short-term and long-term needs.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
     {
       icon: FaGlobe,
       title: "International Moving",
       desc: "Hassle-free international relocation with customs clearance support.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
     {
       icon: FaHandshake,
       title: "Corporate Solutions",
       desc: "Tailored moving solutions for businesses of all sizes.",
-      color: "bg-[#0EA5E9]",
+      color: "bg-primary",
     },
   ];
 
@@ -171,15 +170,19 @@ const Home = () => {
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden" style={{
-        backgroundImage: "url('/bg.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      }}>
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-r from-navy via-navyLight to-navy">
+        {/* Left Half Background Image */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url(/background.jpg)' }}></div>
+
+        {/* Right Half Background Image with Navy Blue Overlay */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-cover bg-center" style={{ backgroundImage: 'url(/truck.png)' }}>
+          <div className="absolute inset-0 bg-navy/90"></div>
+        </div>
+
         {/* Darker Animated Overlay */}
         <motion.div
-          className="absolute inset-0 bg-black/50"
-          animate={{ opacity: [0.45, 0.6, 0.45] }}
+          className="absolute inset-0 bg-black/30"
+          animate={{ opacity: [0.25, 0.4, 0.25] }}
           transition={{ duration: 5, repeat: Infinity }}
         />
 
@@ -191,48 +194,71 @@ const Home = () => {
               transition={{ duration: 0.8 }}
               className="lg:col-start-2"
             >
-              <span className="inline-block bg-primary/40 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <motion.span
+                className="inline-block bg-primary/40 text-white px-4 py-2 rounded-full text-xs font-medium mb-6"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
                 🚚 #1 Rated Packers & Movers in India
-              </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              </motion.span>
+              <motion.h1
+                className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
                 Your Trusted Partner for
-                <span className="text-[#FF6EC7] block">Safe & Swift Moving</span>
-              </h1>
-              <p className="text-xl text-white mb-8 leading-relaxed">
-                Experience stress-free relocation with India's most reliable
-                packers and movers. From local shifting to international moves,
-                we handle it all with care and precision.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+                <span className="text-primary"> Seamless Moves</span>
+              </motion.h1>
+              <motion.p
+                className="text-base text-white/90 max-w-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                From local household moves to international relocations, we handle it all with care and precision.
+              </motion.p>
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              >
                 <Link
                   to="/quote"
-                  className="inline-flex items-center justify-center bg-[#00D9FF] text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-[#00B8D4] transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-sm transition-all duration-300"
                 >
                   Get Free Quote <FiArrowRight className="ml-2" />
                 </Link>
                 <a
                   href="tel:+919876543210"
-                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-black transition-all duration-300"
+                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-sm transition-all duration-300"
                 >
                   <FiPhone className="mr-2" /> Call Now
                 </a>
-              </div>
+              </motion.div>
 
               {/* Trust Badges */}
-              <div className="mt-10 flex flex-wrap items-center gap-6">
-                <div className="flex items-center text-white">
-                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+              <motion.div
+                className="mt-10 flex flex-wrap items-center gap-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <div className="flex items-center text-white text-sm">
+                  <FiCheckCircle className="text-primary mr-2" />
                   <span className="text-white">Free Estimate</span>
                 </div>
-                <div className="flex items-center text-white">
-                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+                <div className="flex items-center text-white text-sm">
+                  <FiCheckCircle className="text-primary mr-2" />
                   <span className="text-white">Insured Moving</span>
                 </div>
-                <div className="flex items-center text-white">
-                  <FiCheckCircle className="text-[#00D9FF] mr-2" />
+                <div className="flex items-center text-white text-sm">
+                  <FiCheckCircle className="text-primary mr-2" />
                   <span className="text-white">24/7 Support</span>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -246,14 +272,14 @@ const Home = () => {
           >
             <path
               d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              fill="#F9FAFB"
+              fill="#F2F2F2"
             />
           </svg>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-neutral">
+      <section className="py-20 bg-bgLight">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -266,15 +292,15 @@ const Home = () => {
               <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center group"
+                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center group hover:bg-navy"
               >
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                  <feature.icon className="text-3xl text-primary group-hover:text-white" />
+                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primaryDark transition-all duration-300">
+                  <feature.icon className="text-3xl text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600">{feature.desc}</p>
+                <p className="text-gray-600 group-hover:text-white/80">{feature.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -282,7 +308,7 @@ const Home = () => {
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -294,10 +320,10 @@ const Home = () => {
             <span className="text-primary font-semibold text-lg">
               What We Offer
             </span>
-            <h2 className="text-4xl font-bold text-gray-800 mt-2 mb-4">
+            <h2 className="text-4xl font-bold text-navy mt-2 mb-4">
               Our Premium Services
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-textMuted max-w-2xl mx-auto">
               From household shifting to corporate relocations, we provide
               comprehensive moving solutions tailored to your specific needs.
             </p>
@@ -314,25 +340,22 @@ const Home = () => {
               <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="bg-neutral rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border-t-4 border-primary"
               >
-                <div className={`h-2 ${service.color}`} />
                 <div className="p-8">
-                  <div
-                    className={`w-14 h-14 ${service.color} rounded-lg flex items-center justify-center mb-6`}
-                  >
-                    <service.icon className="text-2xl text-white" />
+                  <div className="w-14 h-14 bg-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primaryDark transition-colors">
+                    <service.icon className="text-2xl text-white group-hover:text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-semibold text-navy mb-3 group-hover:text-primary transition-colors">
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 mb-4">{service.desc}</p>
+                  <p className="text-textMuted mb-4">{service.desc}</p>
                   <Link
                     to="/services"
-                    className="inline-flex items-center text-primary font-medium hover:text-secondary"
+                    className="inline-flex items-center text-primary font-medium hover:text-primaryDark"
                   >
                     Learn More{" "}
-                    <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    <FiArrowRight className="ml-2 group-hover:text-primary transition-all" />
                   </Link>
                 </div>
               </motion.div>
@@ -347,7 +370,7 @@ const Home = () => {
           >
             <Link
               to="/services"
-              className="inline-flex items-center bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-secondary transition-colors duration-300"
+              className="inline-flex items-center bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primaryDark transition-colors duration-300"
             >
               View All Services <FiArrowRight className="ml-2" />
             </Link>
@@ -356,7 +379,7 @@ const Home = () => {
       </section>
 
       {/* Why Choose Us / Perks Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary">
+      <section className="py-20 bg-navy">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -364,7 +387,7 @@ const Home = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <span className="text-secondary font-semibold text-lg">
+              <span className="text-primary font-semibold text-lg">
                 Why Choose Us
               </span>
               <h2 className="text-4xl font-bold text-white mt-2 mb-6">
@@ -378,14 +401,14 @@ const Home = () => {
               <div className="grid sm:grid-cols-2 gap-4">
                 {perks.map((perk, idx) => (
                   <div key={idx} className="flex items-start">
-                    <FiCheckCircle className="text-accent mt-1 mr-3 flex-shrink-0" />
+                    <FiCheckCircle className="text-primary mt-1 mr-3 flex-shrink-0" />
                     <span className="text-white">{perk}</span>
                   </div>
                 ))}
               </div>
               <Link
                 to="/about"
-                className="inline-flex items-center bg-white text-primary px-8 py-4 rounded-lg font-semibold mt-8 hover:bg-accent hover:text-white transition-all duration-300"
+                className="inline-flex items-center bg-primary text-textDark px-8 py-4 rounded-lg font-semibold mt-8 hover:bg-primaryDark hover:text-white transition-all duration-300"
               >
                 About Our Company <FiArrowRight className="ml-2" />
               </Link>
@@ -404,14 +427,14 @@ const Home = () => {
               />
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-xl">
                 <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 bg-accent rounded-full flex items-center justify-center">
+                  <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center">
                     <FiAward className="text-2xl text-white" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-800">
+                    <p className="text-2xl font-bold text-textDark">
                       15+ Years
                     </p>
-                    <p className="text-gray-600">Of Excellence</p>
+                    <p className="text-textMuted">Of Excellence</p>
                   </div>
                 </div>
               </div>
@@ -421,8 +444,11 @@ const Home = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="py-16 relative overflow-hidden" style={{ backgroundImage: 'url(/satisfaction.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Orange overlay with 90% opacity */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 166, 35, 0.9)' }}></div>
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -436,13 +462,13 @@ const Home = () => {
                 variants={fadeInUp}
                 className="text-center p-6"
               >
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <stat.icon className="text-2xl text-primary" />
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <stat.icon className="text-2xl text-white" />
                 </div>
-                <h3 className="text-4xl font-bold text-primary mb-2">
+                <h3 className="text-4xl font-bold text-white mb-2">
                   {stat.number}
                 </h3>
-                <p className="text-gray-600 font-medium">{stat.label}</p>
+                <p className="text-white/80 font-medium">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -450,7 +476,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-neutral">
+      <section className="py-20 bg-bgLight">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -462,10 +488,10 @@ const Home = () => {
             <span className="text-primary font-semibold text-lg">
               Testimonials
             </span>
-            <h2 className="text-4xl font-bold text-gray-800 mt-2 mb-4">
+            <h2 className="text-4xl font-bold text-navy mt-2 mb-4">
               What Our Customers Say
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-textMuted max-w-2xl mx-auto">
               Don't just take our word for it. Here's what our happy customers
               have to say about their moving experience with us.
             </p>
@@ -486,10 +512,10 @@ const Home = () => {
               >
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <FiStar key={i} className="text-yellow-400 fill-current" />
+                    <FiStar key={i} className="text-primary fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic">
+                <p className="text-textMuted mb-6 italic">
                   "{testimonial.text}"
                 </p>
                 <div className="flex items-center">
@@ -497,10 +523,10 @@ const Home = () => {
                     {testimonial.name.charAt(0)}
                   </div>
                   <div className="ml-4">
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-navy">
                       {testimonial.name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-textMuted">
                       {testimonial.location}
                     </p>
                   </div>
@@ -522,10 +548,10 @@ const Home = () => {
             className="text-center mb-16"
           >
             <span className="text-primary font-semibold text-lg">FAQs</span>
-            <h2 className="text-4xl font-bold text-gray-800 mt-2 mb-4">
+            <h2 className="text-4xl font-bold text-navy mt-2 mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-gray-600">
+            <p className="text-textMuted">
               Find answers to common questions about our moving services.
             </p>
           </motion.div>
@@ -545,20 +571,20 @@ const Home = () => {
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+                  className="w-full px-6 py-5 flex items-center justify-between bg-white hover:bg-bgLight transition-colors"
                 >
-                  <span className="font-semibold text-gray-800 text-left">
+                  <span className="font-semibold text-navy text-left">
                     {faq.q}
                   </span>
                   {openFaq === idx ? (
                     <FiChevronUp className="text-primary flex-shrink-0 ml-4" />
                   ) : (
-                    <FiChevronDown className="text-gray-400 flex-shrink-0 ml-4" />
+                    <FiChevronDown className="text-textMuted flex-shrink-0 ml-4 group-hover:text-primary transition-colors" />
                   )}
                 </button>
                 {openFaq === idx && (
-                  <div className="px-6 py-5 bg-gray-50 border-t border-gray-200">
-                    <p className="text-gray-600">{faq.a}</p>
+                  <div className="px-6 py-5 bg-bgLight border-t border-gray-200">
+                    <p className="text-textMuted">{faq.a}</p>
                   </div>
                 )}
               </motion.div>
@@ -568,9 +594,9 @@ const Home = () => {
       </section>
 
       {/* Trusted Clients Marquee Section */}
-      <section className="py-12 bg-gray-100 overflow-hidden">
+      <section className="py-12 bg-beige overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-navy">
             Trusted By Leading Companies
           </h2>
         </div>
@@ -602,7 +628,7 @@ const Home = () => {
             ].map((client, index) => (
               <div
                 key={index}
-                className="inline-flex items-center justify-center mx-8 bg-white px-8 py-4 rounded-lg shadow-sm min-w-[150px]"
+                className="inline-flex items-center justify-center mx-8 bg-white px-8 py-4 rounded-lg shadow-sm min-w-[150px] border border-primary/20"
               >
                 <img
                   src={client.logo}
@@ -614,13 +640,16 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Yellow Bottom Border like original */}
-        <div className="h-1 bg-yellow-400 mt-8"></div>
+        {/* Primary Bottom Border */}
+        <div className="h-1 bg-primary mt-8"></div>
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      <section className="py-20 relative overflow-hidden" style={{ backgroundImage: 'url(/surety.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Orange overlay with 90% opacity */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 166, 35, 0.9)' }}></div>
+
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -636,13 +665,13 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/quote"
-                className="inline-flex items-center justify-center bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent hover:text-white transition-all duration-300 shadow-lg"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
               >
                 Get Free Quote <FiArrowRight className="ml-2" />
               </Link>
               <a
                 href="tel:+919876543210"
-                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
               >
                 <FiPhone className="mr-2" /> +91 98765 43210
               </a>

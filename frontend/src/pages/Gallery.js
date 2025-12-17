@@ -123,9 +123,9 @@ const Gallery = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral">
+    <div className="min-h-screen bg-gray-100">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-secondary to-primary py-20">
+      <section className="bg-navy py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -151,11 +151,10 @@ const Gallery = () => {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                  activeCategory === cat.id
-                    ? "bg-primary text-white shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                className={`flex items-center px-6 py-3 rounded-full font-medium transition-all duration-300 ${activeCategory === cat.id
+                  ? "bg-primary text-white shadow-lg"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
               >
                 <cat.icon className="mr-2" />
                 {cat.label}
@@ -282,21 +281,37 @@ const Gallery = () => {
       </AnimatePresence>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-primary to-secondary">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Experience Our Service?
-          </h2>
-          <p className="text-white/80 mb-8">
-            Get a free quote and let us handle your next move with the same care
-            and professionalism
-          </p>
-          <a
-            href="/quote"
-            className="inline-block bg-white text-primary px-8 py-4 rounded-lg font-bold hover:bg-light transition-colors shadow-lg"
+      <section className="py-20 relative overflow-hidden" style={{ backgroundImage: 'url(/surety.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Orange overlay with 90% opacity */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 166, 35, 0.9)' }}></div>
+
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
-            Get Free Quote
-          </a>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Experience Our Service?
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Get a free quote and let us handle your next move with the same care and professionalism
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/quote"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
+              >
+                Get Free Quote
+              </a>
+              <a
+                href="tel:+919876543210"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
+              >
+                +91 98765 43210
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </div>

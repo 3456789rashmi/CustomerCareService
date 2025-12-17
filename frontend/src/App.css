@@ -1,5 +1,64 @@
 /* Custom App Styles - Using Tailwind CSS for main styling */
 
+/* ============================================================================
+   HERO SECTION BUTTON HOVER STYLES
+   ============================================================================ */
+
+/* Get Free Quote and Call Now buttons hover effect */
+.border-white.text-white:hover {
+  background-color: #f97316 !important;
+  color: white !important;
+  border-color: #f97316 !important;
+}
+
+/* ============================================================================
+   CTA SECTION BUTTON HOVER STYLES
+   ============================================================================ */
+
+/* CTA section buttons - justify-center class is unique to this section */
+.justify-center .border-white.text-white:hover {
+  background-color: #1F2937 !important;
+  color: white !important;
+  border-color: #1F2937 !important;
+}
+
+/* ============================================================================
+   DROPDOWN HOVER STYLES - Navbar dropdowns
+   ============================================================================ */
+
+/* Services and More dropdown items hover effect */
+.bg-white a:hover[class*="rounded-lg"],
+.bg-gray-50 a:hover[class*="rounded-lg"],
+.rounded-lg:hover:not(.no-hover) {
+  background-color: #1F2937 !important;
+  color: white !important;
+}
+
+/* Dropdown link text on hover */
+.hover\:bg-white:hover,
+.hover\:bg-gray-50:hover,
+.group:hover {
+  background-color: #1F2937 !important;
+}
+
+.group:hover .group-hover\:text-primary {
+  color: white !important;
+}
+
+.group:hover .group-hover\:bg-primary {
+  background-color: #1F2937 !important;
+  color: white !important;
+}
+
+.group:hover .group-hover\:text-white {
+  color: white !important;
+}
+
+/* Icon color on hover only */
+.group:hover svg {
+  color: #D6B78C !important;
+}
+
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
@@ -31,6 +90,7 @@ html {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -50,6 +110,7 @@ html {
     transform: scale(0.8);
     opacity: 1;
   }
+
   100% {
     transform: scale(2);
     opacity: 0;

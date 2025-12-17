@@ -185,18 +185,18 @@ const Navbar = () => {
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-primary text-white py-2 hidden md:block">
+      <div className="bg-navy text-white py-2 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center text-sm">
           <div className="flex items-center space-x-6">
             <a
               href="tel:+919876543210"
-              className="flex items-center hover:text-accent transition-colors"
+              className="flex items-center hover:text-primary transition-colors"
             >
               <FiPhone className="mr-2" /> +91 98765 43210
             </a>
             <a
               href="mailto:info@unitedpackerspro.com"
-              className="flex items-center hover:text-accent transition-colors"
+              className="flex items-center hover:text-primary transition-colors"
             >
               <FiMail className="mr-2" /> info@unitedpackerspro.com
             </a>
@@ -215,23 +215,23 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo with Company Badge */}
-            <Link to="/" className="flex items-center space-x-3 group">
+            <Link to="/" className="flex items-center space-x-3">
               {/* Company Logo Image */}
               <img
                 src="/unitedpackers.png"
                 alt="United Packers Logo"
-                className="w-12 h-12 object-contain group-hover:scale-105 transition-transform duration-300"
+                className="w-12 h-12 object-contain"
               />
               <div>
                 <div className="flex items-baseline">
-                  <span className="text-2xl font-extrabold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                  <span className="text-2xl font-extrabold text-navy">
                     United
                   </span>
-                  <span className="text-2xl font-extrabold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
+                  <span className="text-2xl font-extrabold text-primary ml-1">
                     Packers
                   </span>
                 </div>
-                <span className="block text-xs font-medium text-gray-400 tracking-wider uppercase -mt-1">
+                <span className="block text-xs font-medium text-textMuted tracking-wider uppercase -mt-1">
                   Pro Movers
                 </span>
               </div>
@@ -252,7 +252,7 @@ const Navbar = () => {
                 </Link>
               ))}
 
-              {/* Services Mega Dropdown */}
+              {/* Services Dropdown */}
               <div
                 className="relative"
                 onMouseEnter={handleServicesEnter}
@@ -271,7 +271,7 @@ const Navbar = () => {
                     <div className="grid grid-cols-2">
                       {/* Main Services */}
                       <div className="p-6 bg-gray-50">
-                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+                        <h4 className="text-xs font-bold text-navy uppercase tracking-wider mb-4">
                           Our Services
                         </h4>
                         <div className="space-y-1">
@@ -281,7 +281,7 @@ const Navbar = () => {
                               to={service.path}
                               className="flex items-start p-3 rounded-lg hover:bg-white transition-colors group"
                             >
-                              <service.icon className="text-primary mt-1 mr-3 group-hover:text-secondary" />
+                              <service.icon className="text-primary mt-1 mr-3 group-hover:text-primaryDark" />
                               <div>
                                 <p className="font-medium text-gray-800 group-hover:text-primary">
                                   {service.label}
@@ -297,7 +297,7 @@ const Navbar = () => {
 
                       {/* Quick Links & CTA */}
                       <div className="p-6">
-                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+                        <h4 className="text-xs font-bold text-navy uppercase tracking-wider mb-4">
                           Quick Links
                         </h4>
                         <div className="space-y-3 mb-6">
@@ -311,7 +311,7 @@ const Navbar = () => {
                             </Link>
                           ))}
                         </div>
-                        <div className="bg-gradient-to-r from-primary to-secondary p-4 rounded-lg text-white">
+                        <div className="bg-navy p-4 rounded-lg text-white">
                           <p className="font-semibold mb-2">
                             Need Help Moving?
                           </p>
@@ -320,7 +320,7 @@ const Navbar = () => {
                           </p>
                           <Link
                             to="/quote"
-                            className="inline-block bg-white text-primary px-4 py-2 rounded font-semibold text-sm hover:bg-accent hover:text-white transition-colors"
+                            className="inline-block bg-white text-primary px-4 py-2 rounded font-semibold text-sm hover:bg-primary hover:text-white transition-colors"
                           >
                             Get Quote
                           </Link>
@@ -353,8 +353,7 @@ const Navbar = () => {
                     <div className="flex">
                       {/* Left Side - Image Card */}
                       <div className="w-56 p-4">
-                        <div className="relative h-full bg-gradient-to-br from-primary via-secondary to-accent rounded-xl overflow-hidden">
-                          <div className="absolute inset-0 bg-black/10"></div>
+                        <div className="relative h-full bg-navy rounded-xl overflow-hidden bg-cover bg-center" style={{ backgroundImage: 'linear-gradient(rgba(31, 41, 55, 0.85), rgba(31, 41, 55, 0.85)), url(/photo.jfif)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
                           <div className="relative p-6 h-full flex flex-col justify-end">
                             <p className="text-white/80 text-sm mb-1">
                               Our clients report
@@ -374,7 +373,7 @@ const Navbar = () => {
 
                       {/* Right Side - Navigation Links */}
                       <div className="flex-1 p-6">
-                        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+                        <h4 className="text-xs font-bold text-navy uppercase tracking-wider mb-4">
                           EXPLORE MORE
                         </h4>
                         <div className="space-y-1">
@@ -424,7 +423,7 @@ const Navbar = () => {
                   onMouseEnter={handleUserEnter}
                   onMouseLeave={handleUserLeave}
                 >
-                  <button className="relative inline-flex items-center px-6 py-2.5 font-semibold text-white bg-gradient-to-r from-primary via-secondary to-accent rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+                  <button className="relative inline-flex items-center px-6 py-2.5 font-semibold text-white bg-gradient-to-r from-primary to-primaryDark rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
                     <FiUser className="w-4 h-4 mr-2" />
                     {user?.firstName}
                     <FiChevronDown
@@ -482,9 +481,9 @@ const Navbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="relative inline-flex items-center px-6 py-2.5 font-semibold text-white bg-gradient-to-r from-primary via-secondary to-accent rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 group overflow-hidden"
+                  className="relative inline-flex items-center px-6 py-2.5 font-semibold text-white bg-gradient-to-r from-primary to-primaryDark rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 group overflow-hidden"
                 >
-                  <span className="absolute inset-0 bg-gradient-to-r from-accent via-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-primaryDark to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                   <span className="relative flex items-center">
                     <svg
                       className="w-4 h-4 mr-2"
@@ -597,7 +596,7 @@ const Navbar = () => {
                 <Link
                   to="/quote"
                   onClick={() => setIsOpen(false)}
-                  className="bg-primary text-white px-4 py-3 rounded-lg font-semibold text-center hover:bg-secondary transition-colors mx-4"
+                  className="bg-primary text-white px-4 py-3 rounded-lg font-semibold text-center hover:bg-primaryDark transition-colors mx-4"
                 >
                   Get Free Quote
                 </Link>

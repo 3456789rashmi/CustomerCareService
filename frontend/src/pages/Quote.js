@@ -813,7 +813,7 @@ const Quote = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral">
+    <div className="min-h-screen bg-gray-100">
       {/* Success Modal */}
       {submitSuccess && (
         <motion.div
@@ -903,7 +903,7 @@ const Quote = () => {
       )}
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-secondary to-primary py-16">
+      <section className="bg-navy py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

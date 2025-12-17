@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FiMapPin,
@@ -10,7 +11,6 @@ import {
   FiUser,
   FiCheckCircle,
   FiArrowRight,
-  FiAlertCircle,
 } from "react-icons/fi";
 import {
   FaWhatsapp,
@@ -30,9 +30,6 @@ const Contact = () => {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
-  const [contactId, setContactId] = useState(null);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -42,19 +39,15 @@ const Contact = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setSubmitError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError("");
 
     try {
       const response = await contactAPI.create(formData);
 
       if (response.data.success) {
-        setContactId(response.data.data.contactId);
         setSubmitted(true);
         setFormData({
           name: "",
@@ -65,12 +58,10 @@ const Contact = () => {
         });
       }
     } catch (err) {
-      setSubmitError(
+      console.error(
         err.response?.data?.message ||
-          "Failed to send message. Please try again."
+        "Failed to send message. Please try again."
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -185,7 +176,7 @@ const Contact = () => {
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-secondary to-primary py-20">
+      <section className="relative bg-navy py-20">
         <div className="absolute inset-0 opacity-10">
           <div
             className="absolute inset-0"
@@ -195,24 +186,38 @@ const Contact = () => {
           />
         </div>
         <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <span className="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
-              We're Here to Help
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Get In Touch
-            </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Have questions about your move? Need a quote? Our friendly team is
-              ready to assist you 24/7. Reach out and let's make your relocation
-              seamless.
-            </p>
-          </motion.div>
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-left md:text-left"
+            >
+              <span className="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+                We're Here to Help
+              </span>
+              <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold text-white mb-6">
+                Get In Touch
+              </h1>
+              <p className="text-xl text-white/90 max-w-2xl">
+                Have questions about your move? Need a quote? Our friendly team is
+                ready to assist you 24/7. Reach out and let's make your relocation
+                seamless.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="hidden md:block"
+            >
+              <img
+                src="/services.jpg"
+                alt="Contact Us"
+                className="rounded-2xl shadow-2xl w-full object-cover"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -292,7 +297,7 @@ const Contact = () => {
 
               <form
                 onSubmit={handleSubmit}
-                className="bg-white p-8 rounded-2xl shadow-lg"
+                className="bg-white p-8 rounded-2xl shadow-lg no-hover"
               >
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -306,7 +311,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="Enter your name"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all no-hover"
                       required
                     />
                   </div>
@@ -321,7 +326,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="Enter your email"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all no-hover"
                       required
                     />
                   </div>
@@ -336,7 +341,7 @@ const Contact = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       placeholder="Enter phone number"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all no-hover"
                       required
                     />
                   </div>
@@ -348,7 +353,7 @@ const Contact = () => {
                       name="subject"
                       value={formData.subject}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all no-hover"
                     >
                       <option value="">Select a subject</option>
                       <option value="quote">Request a Quote</option>
@@ -371,7 +376,7 @@ const Contact = () => {
                     onChange={handleInputChange}
                     placeholder="Tell us how we can help you..."
                     rows="5"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none no-hover"
                     required
                   />
                 </div>
@@ -466,7 +471,7 @@ const Contact = () => {
                 </h3>
                 <div className="space-y-4">
                   {faqs.map((faq, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-lg shadow">
+                    <div key={idx} className="bg-white p-4 rounded-lg shadow no-hover">
                       <p className="font-medium text-gray-800">{faq.q}</p>
                       <p className="text-gray-600 text-sm mt-2">{faq.a}</p>
                     </div>
@@ -479,7 +484,7 @@ const Contact = () => {
       </section>
 
       {/* Branch Locations */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -507,7 +512,7 @@ const Contact = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-neutral p-6 rounded-xl hover:shadow-lg transition-shadow"
+                className="bg-white p-6 rounded-xl hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -534,26 +539,38 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary to-secondary">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      {/* Final CTA Section */}
+      <section className="py-20 relative overflow-hidden" style={{ backgroundImage: 'url(/surety.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Orange overlay with 90% opacity */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 166, 35, 0.9)' }}></div>
+
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Ready to Start Your Move?
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Make Your Move?
             </h2>
-            <p className="text-white/90 mb-8">
-              Get a free, no-obligation quote and let us handle the rest.
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Get a free, no-obligation quote today and experience the
+              difference of professional moving services.
             </p>
-            <a
-              href="/quote"
-              className="inline-flex items-center bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-accent hover:text-white transition-all shadow-lg"
-            >
-              Get Free Quote <FiArrowRight className="ml-2" />
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/quote"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
+              >
+                Get Free Quote <FiArrowRight className="ml-2" />
+              </Link>
+              <a
+                href="tel:+919876543210"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
+              >
+                <FiPhone className="mr-2" /> +91 98765 43210
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>

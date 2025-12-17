@@ -39,7 +39,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-navy text-gray-300">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -49,7 +49,7 @@ const Footer = () => {
               <FaTruck className="text-3xl text-primary" />
               <div>
                 <span className="text-2xl font-bold text-white">United</span>
-                <span className="text-2xl font-bold text-accent">Packers</span>
+                <span className="text-2xl font-bold text-primary">Packers</span>
               </div>
             </Link>
             <p className="text-gray-400 mb-6 leading-relaxed">
@@ -63,7 +63,7 @@ const Footer = () => {
                   key={idx}
                   href={social.href}
                   aria-label={social.label}
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors duration-200"
+                  className="w-10 h-10 bg-navyLight rounded-full flex items-center justify-center hover:bg-primary transition-colors duration-200"
                 >
                   <social.icon className="text-lg" />
                 </a>
@@ -81,7 +81,7 @@ const Footer = () => {
                 <li key={link.path}>
                   <Link
                     to={link.path}
-                    className="text-gray-400 hover:text-accent transition-colors duration-200 flex items-center"
+                    className="text-gray-400 hover:text-primary transition-colors duration-200 flex items-center"
                   >
                     <span className="mr-2">›</span> {link.label}
                   </Link>
@@ -100,7 +100,7 @@ const Footer = () => {
                 <li key={idx}>
                   <Link
                     to="/services"
-                    className="text-gray-400 hover:text-accent transition-colors duration-200 flex items-center"
+                    className="text-gray-400 hover:text-primary transition-colors duration-200 flex items-center"
                   >
                     <span className="mr-2">›</span> {service}
                   </Link>
@@ -127,7 +127,7 @@ const Footer = () => {
                 <FiPhone className="text-primary mr-3 flex-shrink-0" />
                 <a
                   href="tel:+919876543210"
-                  className="text-gray-400 hover:text-accent transition-colors"
+                  className="text-gray-400 hover:text-primary transition-colors"
                 >
                   +91 98765 43210
                 </a>
@@ -136,7 +136,7 @@ const Footer = () => {
                 <FiMail className="text-primary mr-3 flex-shrink-0" />
                 <a
                   href="mailto:info@unitedpackerspro.com"
-                  className="text-gray-400 hover:text-accent transition-colors"
+                  className="text-gray-400 hover:text-primary transition-colors"
                 >
                   info@unitedpackerspro.com
                 </a>
@@ -151,7 +151,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-navyLight">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-500 text-sm">
@@ -160,19 +160,19 @@ const Footer = () => {
             <div className="flex space-x-6 text-sm">
               <Link
                 to="/privacy"
-                className="text-gray-500 hover:text-accent transition-colors"
+                className="text-gray-500 hover:text-primary transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="/terms"
-                className="text-gray-500 hover:text-accent transition-colors"
+                className="text-gray-500 hover:text-primary transition-colors"
               >
                 Terms of Service
               </Link>
               <Link
                 to="/sitemap"
-                className="text-gray-500 hover:text-accent transition-colors"
+                className="text-gray-500 hover:text-primary transition-colors"
               >
                 Sitemap
               </Link>

@@ -52,7 +52,7 @@ const Services = () => {
         "Transit insurance coverage",
       ],
       price: "Starting from ₹4,999",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: true,
     },
     {
@@ -72,7 +72,7 @@ const Services = () => {
         "Dedicated project manager",
       ],
       price: "Custom Quote",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -91,7 +91,7 @@ const Services = () => {
         "Multi-vehicle discounts",
       ],
       price: "Starting from ₹6,999",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -110,7 +110,7 @@ const Services = () => {
         "Pest-free environment",
       ],
       price: "Starting from ₹999/month",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -129,7 +129,7 @@ const Services = () => {
         "Cultural orientation support",
       ],
       price: "Custom Quote",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -148,7 +148,7 @@ const Services = () => {
         "Unpacking services included",
       ],
       price: "Starting from ₹1,999",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -167,7 +167,7 @@ const Services = () => {
         "24/7 customer support",
       ],
       price: "Starting from ₹7,999",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
     {
@@ -186,7 +186,7 @@ const Services = () => {
         "Debris removal option",
       ],
       price: "Starting from ₹1,499",
-      color: "from-[#0EA5E9] to-[#06B6D4]",
+      color: "from-primary to-primaryDark",
       popular: false,
     },
   ];
@@ -221,7 +221,7 @@ const Services = () => {
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-secondary to-primary py-20">
+      <section className="relative bg-navy py-20 bg-cover bg-center" style={{ backgroundImage: 'linear-gradient(rgba(31, 41, 55, 0.85), rgba(31, 41, 55, 0.85)), url(/services.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="absolute inset-0 opacity-10">
           <div
             className="absolute inset-0"
@@ -271,10 +271,10 @@ const Services = () => {
                 <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                   {item.step}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <h3 className="text-lg font-semibold text-navy mb-2">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-sm">{item.desc}</p>
+                <p className="text-textMuted text-sm">{item.desc}</p>
                 {idx < processSteps.length - 1 && (
                   <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gray-200" />
                 )}
@@ -285,7 +285,7 @@ const Services = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="py-20 bg-neutral">
+      <section className="py-20 bg-bgLight">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -297,10 +297,10 @@ const Services = () => {
             <span className="text-primary font-semibold text-lg">
               What We Offer
             </span>
-            <h2 className="text-4xl font-bold text-gray-800 mt-2 mb-4">
+            <h2 className="text-4xl font-bold text-navy mt-2 mb-4">
               Complete Moving Solutions
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-textMuted max-w-2xl mx-auto">
               Choose from our comprehensive range of services designed to make
               your move smooth and stress-free.
             </p>
@@ -317,10 +317,10 @@ const Services = () => {
               <motion.div
                 key={service.id}
                 variants={fadeInUp}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 relative group"
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:bg-primary transition-all duration-300 relative group"
               >
                 {service.popular && (
-                  <div className="absolute top-4 right-4 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                  <div className="absolute top-4 right-4 bg-navy text-white text-xs font-bold px-3 py-1 rounded-full z-10">
                     POPULAR
                   </div>
                 )}
@@ -331,27 +331,27 @@ const Services = () => {
                   >
                     <service.icon className="text-3xl text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                  <h3 className="text-2xl font-bold text-navy group-hover:text-white mb-3">
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 mb-4">{service.shortDesc}</p>
+                  <p className="text-textMuted group-hover:text-white/90 mb-4">{service.shortDesc}</p>
 
                   <div className="space-y-2 mb-6">
                     {service.features.slice(0, 4).map((feature, idx) => (
                       <div key={idx} className="flex items-start text-sm">
-                        <FiCheck className="text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                        <span className="text-gray-600">{feature}</span>
+                        <FiCheck className="text-green-500 group-hover:text-white mt-0.5 mr-2 flex-shrink-0" />
+                        <span className="text-textMuted group-hover:text-white/90">{feature}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t pt-4 flex items-center justify-between">
-                    <span className="text-primary font-bold">
+                  <div className="border-t border-gray-200 group-hover:border-white/20 pt-4 flex items-center justify-between">
+                    <span className="text-primary group-hover:text-white font-bold">
                       {service.price}
                     </span>
                     <Link
                       to="/quote"
-                      className="inline-flex items-center text-primary font-semibold hover:text-secondary transition-colors"
+                      className="inline-flex items-center text-primary group-hover:text-white font-semibold hover:gap-2 transition-all"
                     >
                       Get Quote <FiArrowRight className="ml-1" />
                     </Link>
@@ -376,7 +376,7 @@ const Services = () => {
             <span className="text-primary font-semibold text-lg">
               Why Choose Our Services
             </span>
-            <h2 className="text-4xl font-bold text-gray-800 mt-2 mb-4">
+            <h2 className="text-4xl font-bold text-navy mt-2 mb-4">
               The UnitedPackers Advantage
             </h2>
           </motion.div>
@@ -420,16 +420,16 @@ const Services = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="flex items-start p-6 bg-neutral rounded-xl"
+                className="flex items-start p-6 bg-bgLight rounded-xl"
               >
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <item.icon className="text-xl text-primary" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  <h3 className="text-lg font-semibold text-navy mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                  <p className="text-textMuted text-sm">{item.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -438,32 +438,35 @@ const Services = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      <section className="py-20 relative overflow-hidden" style={{ backgroundImage: 'url(/surety.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Orange overlay with 90% opacity */}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(245, 166, 35, 0.9)' }}></div>
+
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Need a Custom Moving Solution?
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
               Contact us today for a personalized quote based on your specific
               requirements.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/quote"
-                className="inline-flex items-center justify-center bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent hover:text-white transition-all duration-300 shadow-lg"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
               >
                 Get Free Quote <FiArrowRight className="ml-2" />
               </Link>
               <a
                 href="tel:+919876543210"
-                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:!bg-navy hover:!text-white hover:!border-navy transition-all duration-300"
               >
-                <FiPhone className="mr-2" /> Call: +91 98765 43210
+                <FiPhone className="mr-2" /> +91 98765 43210
               </a>
             </div>
           </motion.div>

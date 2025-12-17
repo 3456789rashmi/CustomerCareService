@@ -117,7 +117,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-primary flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-navy flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -201,7 +201,7 @@ const Login = () => {
             />
             <div>
               <span className="text-2xl font-extrabold text-white">United</span>
-              <span className="text-2xl font-extrabold text-light">
+              <span className="text-2xl font-extrabold text-orange-500">
                 Packers
               </span>
             </div>
@@ -221,7 +221,7 @@ const Login = () => {
             transition={{ delay: 0.4 }}
             className="text-center mb-6"
           >
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-gray-800">
               Welcome Back!
             </h2>
             <p className="text-gray-500 mt-2">
@@ -244,12 +244,12 @@ const Login = () => {
                 type="button"
                 onClick={() => setLoginType("user")}
                 className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${loginType === "user"
-                  ? "bg-white text-primary shadow-md"
+                  ? "bg-white text-orange-500 shadow-md"
                   : "text-gray-500 hover:text-gray-700"
                   }`}
               >
                 <FiUser
-                  className={`mr-2 ${loginType === "user" ? "text-primary" : "text-gray-400"
+                  className={`mr-2 ${loginType === "user" ? "text-orange-500" : "text-gray-400"
                     }`}
                 />
                 User
@@ -258,7 +258,7 @@ const Login = () => {
                 type="button"
                 onClick={() => setLoginType("admin")}
                 className={`flex-1 flex items-center justify-center py-3 px-4 rounded-lg font-medium transition-all duration-300 ${loginType === "admin"
-                  ? "bg-gradient-to-r from-primary to-secondary text-white shadow-md"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md"
                   : "text-gray-500 hover:text-gray-700"
                   }`}
               >
@@ -371,7 +371,7 @@ const Login = () => {
               </label>
               <Link
                 to="/forgot-password"
-                className="text-sm text-primary hover:text-secondary font-medium"
+                className="text-sm text-orange-500 hover:text-orange-600 font-medium"
               >
                 Forgot Password?
               </Link>
@@ -383,12 +383,12 @@ const Login = () => {
               disabled={isLoading}
               whileHover={{
                 scale: 1.02,
-                boxShadow: "0 10px 30px rgba(59, 10, 69, 0.3)",
+                boxShadow: "0 10px 30px rgba(249, 115, 22, 0.3)",
               }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-primary via-secondary to-accent text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center relative overflow-hidden group"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-accent via-secondary to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
               {isLoading ? (
                 <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
@@ -410,7 +410,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-primary hover:text-secondary font-semibold hover:underline"
+              className="text-orange-500 hover:text-orange-600 font-semibold hover:underline"
             >
               Create Account
             </Link>

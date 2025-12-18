@@ -29,6 +29,7 @@ import Dashboard from "./pages/Dashboard";
 import QuoteTracking from "./pages/QuoteTracking";
 import TrackShipment from "./pages/TrackShipment";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminQuoteDetail from "./pages/AdminQuoteDetail";
 import "./App.css";
 
 // Layout component to conditionally show Navbar/Footer
@@ -123,6 +124,14 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/quote/:quoteId"
+              element={
+                <AdminRoute>
+                  <AdminQuoteDetail />
                 </AdminRoute>
               }
             />

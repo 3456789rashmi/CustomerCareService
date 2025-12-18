@@ -69,12 +69,14 @@ export const quoteAPI = {
   create: (data) => api.post("/quotes", data),
   track: (quoteId) => api.get(`/quotes/track/${quoteId}`),
   getMyQuotes: () => api.get("/users/quotes"),
-  getQuoteDetail: (id) => api.get(`/users/quotes/${id}`),
+  getQuoteDetail: (id) => api.get(`/quotes/details/${id}`),
+  getQuoteFeedback: (quoteId) => api.get(`/feedback/${quoteId}`),
   deleteQuote: (id) => api.delete(`/quotes/${id}/user`),
   cancelQuote: (id) => api.put(`/users/quotes/${id}/cancel`),
   acceptQuote: (id) => api.put(`/users/quotes/${id}/accept`),
   claimQuotes: () => api.post("/quotes/claim"),
   submitFeedback: (data) => api.post(`/feedback/${data.quoteId}`, data),
+  submitPayment: (quoteId, data) => api.put(`/quotes/${quoteId}/payment`, data),
 };
 
 // Enquiry APIs
@@ -120,6 +122,7 @@ export const adminAPI = {
   getAllContacts: (params) => api.get("/contacts", { params }),
   replyContact: (id, reply) => api.put(`/contacts/${id}/reply`, { reply }),
   deleteContact: (id) => api.delete(`/contacts/${id}`),
+  getAllFeedbacks: (params) => api.get("/admin/feedback", { params }),
 };
 
 export default api;

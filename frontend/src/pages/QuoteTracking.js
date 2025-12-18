@@ -19,6 +19,7 @@ import {
     FiCreditCard,
     FiSmartphone,
     FiCheck,
+    FiUser,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { quoteAPI } from "../services/api";
@@ -227,12 +228,47 @@ const QuoteTracking = () => {
                 }
             }
 
-            // TODO: Call API to submit payment
-            // await quoteAPI.submitPayment(quote._id, paymentData);
+            // Submit payment to API
+            const paymentPayload = {
+                paymentMethod: paymentData.paymentMethod,
+                amount: quote.finalCost || quote.estimatedCost,
+                paymentDetails: {
+                    method: paymentData.paymentMethod,
+                    ...(paymentData.paymentMethod === "credit_card" || paymentData.paymentMethod === "debit_card") && {
+                        cardLast4: paymentData.cardNumber.slice(-4),
+                        cardHolderName: paymentData.cardHolderName,
+                    },
+                    ...(paymentData.paymentMethod === "upi") && {
+                        upiId: paymentData.upiId,
+                    },
+                    ...(paymentData.paymentMethod === "net_banking") && {
+                        bankName: paymentData.bankName,
+                        accountHolder: paymentData.accountHolder,
+                        ifscCode: paymentData.ifscCode,
+                    },
+                }
+            };
+
+            await quoteAPI.submitPayment(quote._id, paymentPayload);
 
             setPaymentSuccess(true);
+            // Reset form
+            setPaymentData({
+                paymentMethod: "",
+                cardNumber: "",
+                cardHolderName: "",
+                cardExpiry: "",
+                cardCVV: "",
+                upiId: "",
+                bankName: "",
+                accountHolder: "",
+                accountNumber: "",
+                ifscCode: "",
+            });
+
             setTimeout(() => {
                 setPaymentSuccess(false);
+                fetchQuoteDetails(); // Refresh to show payment status
             }, 3000);
         } catch (err) {
             console.error("Payment submission error:", err);
@@ -782,6 +818,81 @@ const QuoteTracking = () => {
                     </motion.div>
                 )}
 
+                {/* Task Incharge Section - Only for accepted quotes */}
+                {quote.status === "accepted" && quote.taskIncharge && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white rounded-xl shadow-lg p-8 mt-8"
+                    >
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                            <FiUser className="text-primary" />
+                            Your Task Incharge
+                        </h2>
+
+                        <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-6 text-white mb-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-primary font-bold text-2xl flex-shrink-0">
+                                    {quote.taskIncharge.name?.charAt(0)?.toUpperCase()}
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-xl font-bold mb-1">{quote.taskIncharge.name}</h3>
+                                    {quote.taskIncharge.designation && (
+                                        <p className="text-white/80 mb-3">{quote.taskIncharge.designation}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 text-blue-600 mb-2">
+                                    <FiPhone size={18} />
+                                    <span className="text-sm font-semibold">Phone Number</span>
+                                </div>
+                                <a
+                                    href={`tel:${quote.taskIncharge.phone}`}
+                                    className="text-lg font-semibold text-gray-800 hover:text-primary transition-colors"
+                                >
+                                    {quote.taskIncharge.phone}
+                                </a>
+                            </div>
+
+                            <div className="bg-green-50 p-4 rounded-lg">
+                                <div className="flex items-center gap-2 text-green-600 mb-2">
+                                    <FiMail size={18} />
+                                    <span className="text-sm font-semibold">Email</span>
+                                </div>
+                                <a
+                                    href={`mailto:${quote.taskIncharge.email}`}
+                                    className="text-lg font-semibold text-gray-800 hover:text-primary transition-colors break-all"
+                                >
+                                    {quote.taskIncharge.email}
+                                </a>
+                            </div>
+                        </div>
+
+                        {quote.taskIncharge.assignedDate && (
+                            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-semibold">Assigned on:</span> {new Date(quote.taskIncharge.assignedDate).toLocaleDateString("en-IN", {
+                                        weekday: "long",
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p className="text-amber-800">
+                                <span className="font-semibold">📞 Feel free to contact your task incharge</span> for any queries, updates, or assistance regarding your moving quote. They will coordinate all the details with you.
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* Payment Section - Only for accepted quotes */}
                 {quote.status === "accepted" && (
                     <motion.div
@@ -831,20 +942,20 @@ const QuoteTracking = () => {
                                                 }))
                                             }
                                             className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${paymentData.paymentMethod === method.value
-                                                    ? "border-primary bg-primary/5 shadow-md"
-                                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                                ? "border-primary bg-primary/5 shadow-md"
+                                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                                                 }`}
                                         >
                                             <method.icon
                                                 className={`text-2xl mx-auto mb-2 ${paymentData.paymentMethod === method.value
-                                                        ? "text-primary"
-                                                        : "text-gray-500"
+                                                    ? "text-primary"
+                                                    : "text-gray-500"
                                                     }`}
                                             />
                                             <p
                                                 className={`font-semibold text-sm ${paymentData.paymentMethod === method.value
-                                                        ? "text-primary"
-                                                        : "text-gray-700"
+                                                    ? "text-primary"
+                                                    : "text-gray-700"
                                                     }`}
                                             >
                                                 {method.label}

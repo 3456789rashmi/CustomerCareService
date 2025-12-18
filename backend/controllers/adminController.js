@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Quote = require("../models/Quote");
 const Enquiry = require("../models/Enquiry");
 const Contact = require("../models/Contact");
+const Feedback = require("../models/Feedback");
 
 // @desc    Get admin dashboard statistics
 // @route   GET /api/admin/dashboard
@@ -120,7 +121,7 @@ exports.getAdminDashboard = async (req, res) => {
         totalEnquiries,
         totalContacts,
         pendingQuotes,
-        confirmedQuotes: await Quote.countDocuments({ status: "confirmed" }),
+        acceptedQuotes: await Quote.countDocuments({ status: "accepted" }),
         completedQuotes: await Quote.countDocuments({ status: "completed" }),
         users: {
           total: totalUsers,
@@ -373,6 +374,40 @@ exports.createAdmin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to create admin",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Get all feedbacks
+// @route   GET /api/admin/feedback
+// @access  Private/Admin
+exports.getAllFeedback = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, sort = "-createdAt" } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const feedbacks = await Feedback.find()
+      .populate("quoteId", "quoteId moveType fromCity toCity status")
+      .populate("userId", "firstName lastName email phone")
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Feedback.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      count: feedbacks.length,
+      total,
+      pages: Math.ceil(total / parseInt(limit)),
+      currentPage: parseInt(page),
+      data: feedbacks,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch feedbacks",
       error: error.message,
     });
   }

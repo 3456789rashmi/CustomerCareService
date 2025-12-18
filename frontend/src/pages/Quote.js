@@ -903,8 +903,19 @@ const Quote = () => {
       )}
 
       {/* Hero Section */}
-      <section className="bg-navy py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+      <section className="relative py-16 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(/shifting.jfif)',
+          }}
+        ></div>
+
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-navy/75"></div>
+
+        <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

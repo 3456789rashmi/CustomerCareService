@@ -8,6 +8,7 @@ const {
   updateUser,
   deleteUser,
   createAdmin,
+  getAllFeedback,
 } = require("../controllers/adminController");
 
 // All routes require admin role
@@ -16,6 +17,9 @@ router.use(authorize("admin"));
 
 // @route   GET /api/admin/dashboard - Get admin dashboard stats
 router.get("/dashboard", getAdminDashboard);
+
+// @route   GET /api/admin/feedback - Get all feedbacks (admin only)
+router.get("/feedback", getAllFeedback);
 
 // @route   GET /api/admin/users - Get all users
 router.get("/users", getAllUsers);
@@ -31,5 +35,8 @@ router.delete("/users/:id", deleteUser);
 
 // @route   POST /api/admin/create-admin - Create new admin user
 router.post("/create-admin", createAdmin);
+
+// @route   GET /api/admin/feedback - Get all feedbacks
+router.get("/feedback", getAllFeedback);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   FiUsers,
   FiFileText,
@@ -25,18 +26,20 @@ import {
   FiBell,
   FiWifi,
   FiWifiOff,
+  FiStar,
 } from "react-icons/fi";
 import { adminAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [stats, setStats] = useState(null);
   const [quotes, setQuotes] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
-  const [contacts, setContacts] = useState([]);
   const [users, setUsers] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -91,10 +94,22 @@ const AdminDashboard = () => {
     quotes: 0,
     users: 0,
     enquiries: 0,
-    contacts: 0,
   });
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+
+  // Accept Quote Modal states
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [acceptQuoteData, setAcceptQuoteData] = useState({
+    taskIncharge: {
+      name: "",
+      phone: "",
+      email: "",
+      designation: "",
+    },
+  });
+  const [acceptQuoteLoading, setAcceptQuoteLoading] = useState(false);
+
   const pollingIntervalRef = useRef(null);
   const previousStatsRef = useRef(null);
 
@@ -118,6 +133,17 @@ const AdminDashboard = () => {
             `🎉 ${diff} new quote${diff > 1 ? "s" : ""} received!`
           );
         }
+        // Check for deleted quotes
+        else if (newCounts.quotes < (prevCounts.quotes || 0)) {
+          const diff = (prevCounts.quotes || 0) - newCounts.quotes;
+          showNewItemNotification(
+            `🗑️ ${diff} quote${diff > 1 ? "s" : ""} deleted!`
+          );
+          // Refresh quotes data if on quotes tab
+          if (activeTab === "quotes") {
+            fetchQuotes();
+          }
+        }
 
         // Check for new users
         if (newCounts.users > (prevCounts.users || 0)) {
@@ -126,6 +152,17 @@ const AdminDashboard = () => {
           showNewItemNotification(
             `👤 ${diff} new user${diff > 1 ? "s" : ""} registered!`
           );
+        }
+        // Check for deleted users
+        else if (newCounts.users < (prevCounts.users || 0)) {
+          const diff = (prevCounts.users || 0) - newCounts.users;
+          showNewItemNotification(
+            `🗑️ ${diff} user${diff > 1 ? "s" : ""} deleted!`
+          );
+          // Refresh users data if on users tab
+          if (activeTab === "users") {
+            fetchUsers();
+          }
         }
 
         // Check for new enquiries
@@ -139,18 +176,19 @@ const AdminDashboard = () => {
             `❓ ${diff} new enquir${diff > 1 ? "ies" : "y"} received!`
           );
         }
-
-        // Check for new contacts
-        if (newCounts.contacts > (prevCounts.contacts || 0)) {
-          const diff = newCounts.contacts - (prevCounts.contacts || 0);
-          setNewItemsCount((prev) => ({
-            ...prev,
-            contacts: prev.contacts + diff,
-          }));
+        // Check for deleted enquiries
+        else if (newCounts.enquiries < (prevCounts.enquiries || 0)) {
+          const diff = (prevCounts.enquiries || 0) - newCounts.enquiries;
           showNewItemNotification(
-            `📧 ${diff} new contact${diff > 1 ? "s" : ""} received!`
+            `🗑️ ${diff} enquir${diff > 1 ? "ies" : "y"} deleted!`
           );
+          // Refresh enquiries data if on enquiries tab
+          if (activeTab === "enquiries") {
+            fetchEnquiries();
+          }
         }
+
+
       }
 
       previousStatsRef.current = newStats;
@@ -159,7 +197,8 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error("Failed to check for new items:", err);
     }
-  }, [isLiveUpdating, stats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLiveUpdating, stats, activeTab]);
 
   // Show notification
   const showNewItemNotification = (message) => {
@@ -194,8 +233,6 @@ const AdminDashboard = () => {
       setNewItemsCount((prev) => ({ ...prev, users: 0 }));
     } else if (activeTab === "enquiries") {
       setNewItemsCount((prev) => ({ ...prev, enquiries: 0 }));
-    } else if (activeTab === "contacts") {
-      setNewItemsCount((prev) => ({ ...prev, contacts: 0 }));
     }
   }, [activeTab]);
 
@@ -240,16 +277,7 @@ const AdminDashboard = () => {
     }
   }, [statusFilter]);
 
-  const fetchContacts = useCallback(async () => {
-    try {
-      const res = await adminAPI.getAllContacts({
-        status: statusFilter !== "all" ? statusFilter : undefined,
-      });
-      setContacts(res.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch contacts:", err);
-    }
-  }, [statusFilter]);
+
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -260,16 +288,32 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  const fetchFeedbacks = useCallback(async () => {
+    try {
+      const res = await adminAPI.getAllFeedbacks();
+      setFeedbacks(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch feedbacks:", err);
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab === "quotes") fetchQuotes();
     if (activeTab === "enquiries") fetchEnquiries();
-    if (activeTab === "contacts") fetchContacts();
     if (activeTab === "users") fetchUsers();
-  }, [activeTab, statusFilter, fetchQuotes, fetchEnquiries, fetchContacts, fetchUsers]);
+    if (activeTab === "feedbacks") fetchFeedbacks();
+  }, [activeTab, statusFilter, fetchQuotes, fetchEnquiries, fetchUsers, fetchFeedbacks]);
 
-  const updateQuoteStatus = async (id, status) => {
+  const updateQuoteStatus = async (id, status, taskIncharge = null) => {
     try {
-      await adminAPI.updateQuote(id, { status });
+      const updateData = { status };
+      if (status === "accepted" && taskIncharge) {
+        updateData.taskIncharge = {
+          ...taskIncharge,
+          assignedDate: new Date(),
+        };
+      }
+      await adminAPI.updateQuote(id, updateData);
       fetchQuotes();
       fetchDashboardData(); // Update stats
     } catch (err) {
@@ -365,17 +409,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const deleteContact = async (id) => {
-    if (window.confirm("Are you sure you want to delete this contact?")) {
-      try {
-        await adminAPI.deleteContact(id);
-        fetchContacts();
-        fetchDashboardData();
-      } catch (err) {
-        console.error("Failed to delete contact:", err);
-      }
-    }
-  };
+
 
   // User Management Functions
   const openUserModal = (user, mode) => {
@@ -547,24 +581,23 @@ const AdminDashboard = () => {
       icon: FiMessageSquare,
       badge: newItemsCount.enquiries,
     },
-    {
-      id: "contacts",
-      label: "Contacts",
-      icon: FiMail,
-      badge: newItemsCount.contacts,
-    },
+    { id: "feedbacks", label: "Feedbacks", icon: FiStar, badge: 0 },
     { id: "users", label: "Users", icon: FiUsers, badge: newItemsCount.users },
   ];
 
   const getStatusColor = (status) => {
     const colors = {
       pending: "bg-yellow-100 text-yellow-800",
-      contacted: "bg-blue-100 text-blue-800",
-      confirmed: "bg-green-100 text-green-800",
+      reviewing: "bg-blue-100 text-blue-800",
+      accepted: "bg-green-100 text-green-800",
       completed: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
       cancelled: "bg-red-100 text-red-800",
-      resolved: "bg-green-100 text-green-800",
       new: "bg-purple-100 text-purple-800",
+      responded: "bg-indigo-100 text-indigo-800",
+      "in-progress": "bg-cyan-100 text-cyan-800",
+      resolved: "bg-emerald-100 text-emerald-800",
+      closed: "bg-slate-100 text-slate-800",
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
@@ -609,8 +642,13 @@ const AdminDashboard = () => {
       </AnimatePresence>
 
       {/* Admin Header */}
-      <div className="bg-gradient-to-r from-primary via-secondary to-primary py-8">
-        <div className="max-w-7xl mx-auto px-4">
+      <div
+        className="bg-gradient-to-r from-primary via-secondary to-primary py-8 bg-cover bg-center relative"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 140, 0, 0.6), rgba(255, 127, 39, 0.6)), url('/admin.jfif')`,
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
@@ -624,7 +662,7 @@ const AdminDashboard = () => {
               <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-3">
                 <button
                   onClick={() => setIsLiveUpdating(!isLiveUpdating)}
-                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiveUpdating ? "text-green-300" : "text-white/60"
+                  className={`flex items-center gap-2 text-sm font-bold transition-colors ${isLiveUpdating ? "text-green-300" : "text-white/60"
                     }`}
                 >
                   {isLiveUpdating ? (
@@ -644,7 +682,7 @@ const AdminDashboard = () => {
                   )}
                 </button>
                 <div className="border-l border-white/30 pl-3">
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-white/80 font-semibold">
                     Updated: {lastUpdated.toLocaleTimeString()}
                   </p>
                 </div>
@@ -655,10 +693,9 @@ const AdminDashboard = () => {
                   fetchDashboardData();
                   if (activeTab === "quotes") fetchQuotes();
                   if (activeTab === "enquiries") fetchEnquiries();
-                  if (activeTab === "contacts") fetchContacts();
                   if (activeTab === "users") fetchUsers();
                 }}
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-bold"
               >
                 <FiRefreshCw className={loading ? "animate-spin" : ""} />
                 Refresh
@@ -744,7 +781,7 @@ const AdminDashboard = () => {
                         {stats.pendingQuotes || 0} Pending
                       </span>
                       <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                        {stats.confirmedQuotes || 0} Confirmed
+                        {stats.acceptedQuotes || 0} Accepted
                       </span>
                     </div>
                   </div>
@@ -767,7 +804,7 @@ const AdminDashboard = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-gray-500 text-sm">
-                          Contact Messages
+                          Feedbacks
                         </p>
                         <p className="text-3xl font-bold text-gray-800">
                           {stats.totalContacts || 0}
@@ -786,18 +823,18 @@ const AdminDashboard = () => {
                     <h3 className="text-lg font-bold text-gray-800 mb-4">
                       Recent Quotes
                     </h3>
-                    {stats.recentQuotes?.length > 0 ? (
+                    {stats.recentActivity?.quotes?.length > 0 ? (
                       <div className="space-y-3">
-                        {stats.recentQuotes.slice(0, 5).map((quote, idx) => (
+                        {stats.recentActivity.quotes.slice(0, 5).map((quote, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-primary transition-colors cursor-pointer group"
                           >
                             <div>
-                              <p className="font-medium text-gray-800">
+                              <p className="font-medium text-gray-800 group-hover:text-white transition-colors">
                                 {quote.name}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 group-hover:text-white transition-colors">
                                 {quote.fromCity} → {quote.toCity}
                               </p>
                             </div>
@@ -822,21 +859,21 @@ const AdminDashboard = () => {
                     <h3 className="text-lg font-bold text-gray-800 mb-4">
                       Recent Enquiries
                     </h3>
-                    {stats.recentEnquiries?.length > 0 ? (
+                    {stats.recentActivity?.enquiries?.length > 0 ? (
                       <div className="space-y-3">
-                        {stats.recentEnquiries
+                        {stats.recentActivity.enquiries
                           .slice(0, 5)
                           .map((enquiry, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-primary transition-colors cursor-pointer group"
                             >
                               <div>
-                                <p className="font-medium text-gray-800">
+                                <p className="font-medium text-gray-800 group-hover:text-white transition-colors">
                                   {enquiry.name}
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                  {enquiry.serviceType}
+                                <p className="text-sm text-gray-500 group-hover:text-white transition-colors">
+                                  {enquiry.subject}
                                 </p>
                               </div>
                               <span
@@ -888,8 +925,8 @@ const AdminDashboard = () => {
                       >
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
-                        <option value="contacted">Contacted</option>
-                        <option value="confirmed">Confirmed</option>
+                        <option value="reviewing">Under Review</option>
+                        <option value="accepted">Accepted</option>
                         <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
@@ -940,21 +977,21 @@ const AdminDashboard = () => {
                           .map((quote) => (
                             <tr
                               key={quote._id}
-                              className="border-b hover:bg-gray-50"
+                              className="border-b hover:bg-primary transition-colors duration-200 group"
                             >
-                              <td className="py-3 px-4 font-medium text-primary">
+                              <td className="py-3 px-4 font-medium text-primary group-hover:text-white">
                                 {quote.quoteId}
                               </td>
-                              <td className="py-3 px-4">
-                                <p className="font-medium">{quote.name}</p>
-                                <p className="text-sm text-gray-500">
+                              <td className="py-3 px-4 group-hover:text-white">
+                                <p className="font-medium text-gray-900 group-hover:text-white">{quote.name}</p>
+                                <p className="text-sm text-gray-500 group-hover:text-white transition-colors">
                                   {quote.phone}
                                 </p>
                               </td>
-                              <td className="py-3 px-4">
+                              <td className="py-3 px-4 text-gray-900 group-hover:text-white">
                                 {quote.fromCity} → {quote.toCity}
                               </td>
-                              <td className="py-3 px-4 text-sm">
+                              <td className="py-3 px-4 text-sm text-gray-900 group-hover:text-white">
                                 {new Date(quote.moveDate).toLocaleDateString()}
                               </td>
                               <td className="py-3 px-4">
@@ -968,27 +1005,26 @@ const AdminDashboard = () => {
                                   )}`}
                                 >
                                   <option value="pending">Pending</option>
-                                  <option value="contacted">Contacted</option>
-                                  <option value="confirmed">Confirmed</option>
+                                  <option value="reviewing">Under Review</option>
+                                  <option value="accepted">Accepted</option>
+                                  <option value="completed">Completed</option>
+                                  <option value="rejected">Rejected</option>
                                   <option value="completed">Completed</option>
                                   <option value="cancelled">Cancelled</option>
                                 </select>
                               </td>
                               <td className="py-3 px-4">
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 group-hover:text-white">
                                   <button
-                                    onClick={() => {
-                                      setSelectedItem(quote);
-                                      setShowModal(true);
-                                    }}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                                    onClick={() => navigate(`/admin/quote/${quote.quoteId}`)}
+                                    className="p-2 text-white group-hover:text-white hover:bg-blue-50 group-hover:hover:bg-transparent rounded"
                                     title="View Details"
                                   >
                                     <FiEye />
                                   </button>
                                   <button
                                     onClick={() => deleteQuote(quote._id)}
-                                    className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                    className="p-2 text-red-600 group-hover:text-white hover:bg-red-50 group-hover:hover:bg-transparent rounded"
                                     title="Delete Quote"
                                   >
                                     <FiTrash2 />
@@ -1032,7 +1068,7 @@ const AdminDashboard = () => {
                     {enquiries.map((enquiry) => (
                       <div
                         key={enquiry._id}
-                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                        className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-blue-50 to-cyan-50"
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
@@ -1048,11 +1084,54 @@ const AdminDashboard = () => {
                             <p className="text-gray-600 mt-2">
                               {enquiry.message}
                             </p>
+
+                            {/* Display response if exists */}
+                            {enquiry.response && (
+                              <div className="mt-3 p-3 bg-white rounded border border-green-200">
+                                <p className="text-sm font-semibold text-green-700 mb-2">✅ Admin Response:</p>
+                                <p className="text-gray-600 text-sm mb-2">
+                                  {enquiry.response}
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex flex-wrap gap-4 text-sm mt-3">
+                              <div>
+                                <p className="text-gray-500 text-xs">Submitted</p>
+                                <p className="text-gray-800 font-medium">
+                                  {enquiry.createdAt
+                                    ? new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                    : "N/A"}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 text-xs">Preferred Callback</p>
+                                <p className="text-gray-800 font-medium">
+                                  {enquiry.callbackTime || "Any Time"}
+                                </p>
+                              </div>
+                              {enquiry.expectedMoveDate && (
+                                <div>
+                                  <p className="text-gray-500 text-xs">Expected Move</p>
+                                  <p className="text-gray-800 font-medium">
+                                    {new Date(enquiry.expectedMoveDate).toLocaleDateString("en-IN", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => openEnquiryModal(enquiry)}
-                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+                              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors whitespace-nowrap"
                               title="Send Response"
                             >
                               Reply
@@ -1094,7 +1173,10 @@ const AdminDashboard = () => {
             )}
 
             {/* Contacts Tab */}
-            {activeTab === "contacts" && (
+
+
+            {/* Feedbacks Tab */}
+            {activeTab === "feedbacks" && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1102,10 +1184,10 @@ const AdminDashboard = () => {
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-bold text-gray-800">
-                      Contact Messages
+                      Customer Feedbacks
                     </h3>
                     <button
-                      onClick={fetchContacts}
+                      onClick={fetchFeedbacks}
                       className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200"
                     >
                       <FiRefreshCw />
@@ -1113,48 +1195,63 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {contacts.map((contact) => (
+                    {feedbacks.map((feedback) => (
                       <div
-                        key={contact._id}
-                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                        key={feedback._id}
+                        className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-amber-50 to-orange-50"
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-800">
-                              {contact.name}
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <FiStar
+                                    key={i}
+                                    size={16}
+                                    className={i < feedback.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-sm font-semibold text-gray-700">
+                                {feedback.rating}/5
+                              </span>
+                            </div>
+                            {feedback.userId && (
+                              <p className="font-semibold text-gray-800">
+                                {feedback.userId.firstName} {feedback.userId.lastName}
+                              </p>
+                            )}
+                            {feedback.userId?.email && (
+                              <p className="text-sm text-gray-500">
+                                {feedback.userId.email} • {feedback.userId.phone}
+                              </p>
+                            )}
+                            {feedback.quoteId && (
+                              <p className="text-sm text-primary mt-1 font-medium">
+                                Quote: {feedback.quoteId.quoteId} • {feedback.quoteId.fromCity} → {feedback.quoteId.toCity}
+                              </p>
+                            )}
+                            {feedback.comment && (
+                              <p className="text-gray-700 mt-2 italic">
+                                "{feedback.comment}"
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-500 mt-2">
+                              {new Date(feedback.createdAt).toLocaleDateString("en-IN", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              })}
                             </p>
-                            <p className="text-sm text-gray-500">
-                              {contact.email} • {contact.phone}
-                            </p>
-                            <p className="font-medium text-primary mt-1">
-                              {contact.subject}
-                            </p>
-                            <p className="text-gray-600 mt-2">
-                              {contact.message}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-                                contact.status
-                              )}`}
-                            >
-                              {contact.status}
-                            </span>
-                            <button
-                              onClick={() => deleteContact(contact._id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded"
-                              title="Delete Contact"
-                            >
-                              <FiTrash2 />
-                            </button>
                           </div>
                         </div>
                       </div>
                     ))}
-                    {contacts.length === 0 && (
+                    {feedbacks.length === 0 && (
                       <p className="text-center text-gray-500 py-8">
-                        No contact messages found
+                        No feedbacks received yet
                       </p>
                     )}
                   </div>
@@ -1176,7 +1273,7 @@ const AdminDashboard = () => {
                     <div className="flex gap-3 flex-wrap">
                       <button
                         onClick={openCreateAdminModal}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all font-medium"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white rounded-lg hover:shadow-lg hover:from-blue-600 hover:via-blue-700 hover:to-blue-800 transition-all font-medium"
                       >
                         <FiUserPlus size={18} />
                         Create Admin
@@ -1272,21 +1369,21 @@ const AdminDashboard = () => {
                           .map((user) => (
                             <tr
                               key={user._id}
-                              className="border-b hover:bg-gray-50 transition-colors"
+                              className="border-b hover:bg-gray-100 transition-colors group"
                             >
                               <td className="py-3 px-4">
                                 <div className="flex items-center gap-3">
                                   <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${user.role === "admin"
                                       ? "bg-gradient-to-r from-primary to-secondary"
-                                      : "bg-gray-400"
+                                      : "bg-amber-500"
                                       }`}
                                   >
                                     {user.firstName?.charAt(0)}
                                     {user.lastName?.charAt(0)}
                                   </div>
                                   <div>
-                                    <p className="font-medium text-gray-800">
+                                    <p className="font-medium text-gray-800 group-hover:text-white">
                                       {user.firstName} {user.lastName}
                                       {user._id === currentUser?._id && (
                                         <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
@@ -1298,10 +1395,10 @@ const AdminDashboard = () => {
                                 </div>
                               </td>
                               <td className="py-3 px-4">
-                                <p className="text-gray-600 text-sm">
+                                <p className="text-gray-600 text-sm group-hover:text-white">
                                   {user.email}
                                 </p>
-                                <p className="text-gray-500 text-sm">
+                                <p className="text-gray-500 text-sm group-hover:text-white">
                                   {user.phone}
                                 </p>
                               </td>
@@ -1324,7 +1421,7 @@ const AdminDashboard = () => {
                                   <option value="admin">Admin</option>
                                 </select>
                               </td>
-                              <td className="py-3 px-4 text-sm text-gray-500">
+                              <td className="py-3 px-4 text-sm text-gray-500 group-hover:text-white">
                                 {new Date(user.createdAt).toLocaleDateString(
                                   "en-US",
                                   {
@@ -1335,17 +1432,17 @@ const AdminDashboard = () => {
                                 )}
                               </td>
                               <td className="py-3 px-4">
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 group-hover:text-white">
                                   <button
                                     onClick={() => openUserModal(user, "view")}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                    className="p-2 text-white group-hover:text-white hover:bg-blue-50 group-hover:hover:bg-transparent rounded-lg transition-colors"
                                     title="View Details"
                                   >
                                     <FiEye size={18} />
                                   </button>
                                   <button
                                     onClick={() => openUserModal(user, "edit")}
-                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                    className="p-2 text-white group-hover:text-white hover:bg-green-50 group-hover:hover:bg-transparent rounded-lg transition-colors"
                                     title="Edit User"
                                   >
                                     <FiEdit size={18} />
@@ -1357,13 +1454,9 @@ const AdminDashboard = () => {
                                     disabled={user._id === currentUser?._id}
                                     className={`p-2 rounded-lg transition-colors ${user._id === currentUser?._id
                                       ? "text-gray-300 cursor-not-allowed"
-                                      : "text-red-600 hover:bg-red-50"
+                                      : "text-white group-hover:text-white hover:bg-red-50 group-hover:hover:bg-transparent"
                                       }`}
-                                    title={
-                                      user._id === currentUser?._id
-                                        ? "Can't delete yourself"
-                                        : "Delete User"
-                                    }
+                                    title={"Delete User"}
                                   >
                                     <FiTrash2 size={18} />
                                   </button>
@@ -1538,6 +1631,26 @@ const AdminDashboard = () => {
                   Admin Actions
                 </p>
                 <div className="flex flex-wrap gap-2">
+                  {selectedItem.status !== "accepted" &&
+                    selectedItem.status !== "completed" && (
+                      <button
+                        onClick={() => {
+                          setAcceptQuoteData({
+                            taskIncharge: {
+                              name: "",
+                              phone: "",
+                              email: "",
+                              designation: "",
+                            },
+                          });
+                          setShowAcceptModal(true);
+                        }}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
+                      >
+                        <FiCheckCircle size={16} />
+                        Accept Quote
+                      </button>
+                    )}
                   {selectedItem.status !== "contacted" &&
                     selectedItem.status !== "confirmed" &&
                     selectedItem.status !== "completed" && (
@@ -1580,7 +1693,7 @@ const AdminDashboard = () => {
                           status: "completed",
                         });
                       }}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
+                      className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 flex items-center gap-2"
                     >
                       <FiCheckCircle size={16} />
                       Mark as Completed
@@ -1738,55 +1851,55 @@ const AdminDashboard = () => {
               {userModalMode === "view" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-500 mb-1">
+                    <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                      <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                         <FiUser size={14} />
                         <span className="text-xs uppercase">First Name</span>
                       </div>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 group-hover:text-white">
                         {selectedUser.firstName}
                       </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-500 mb-1">
+                    <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                      <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                         <FiUser size={14} />
                         <span className="text-xs uppercase">Last Name</span>
                       </div>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 group-hover:text-white">
                         {selectedUser.lastName}
                       </p>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 text-gray-500 mb-1">
+                  <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                    <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                       <FiMail size={14} />
                       <span className="text-xs uppercase">Email</span>
                     </div>
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-gray-800 group-hover:text-white">
                       {selectedUser.email}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-500 mb-1">
+                    <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                      <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                         <FiPhone size={14} />
                         <span className="text-xs uppercase">Phone</span>
                       </div>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 group-hover:text-white">
                         {selectedUser.phone || "N/A"}
                       </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center gap-2 text-gray-500 mb-1">
+                    <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                      <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                         <FiShield size={14} />
                         <span className="text-xs uppercase">Role</span>
                       </div>
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${selectedUser.role === "admin"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-gray-200 text-gray-700"
+                          ? "bg-purple-100 text-purple-800 group-hover:bg-purple-600 group-hover:text-white"
+                          : "bg-gray-200 text-gray-700 group-hover:bg-opacity-20 group-hover:text-white"
                           }`}
                       >
                         {selectedUser.role}
@@ -1794,12 +1907,12 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 text-gray-500 mb-1">
+                  <div className="bg-gray-50 p-4 rounded-lg hover:bg-primary transition-colors group cursor-pointer">
+                    <div className="flex items-center gap-2 text-gray-500 mb-1 group-hover:text-white">
                       <FiCalendar size={14} />
                       <span className="text-xs uppercase">Member Since</span>
                     </div>
-                    <p className="font-semibold text-gray-800">
+                    <p className="font-semibold text-gray-800 group-hover:text-white">
                       {new Date(selectedUser.createdAt).toLocaleDateString(
                         "en-US",
                         {
@@ -2335,6 +2448,187 @@ const AdminDashboard = () => {
                     ) : (
                       <>
                         <FiCheck /> Send Response
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Accept Quote Modal */}
+        {showAcceptModal && selectedItem && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-gray-800">Accept Quote & Assign Task</h3>
+                <button
+                  onClick={() => setShowAcceptModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded"
+                >
+                  <FiX />
+                </button>
+              </div>
+
+              {/* Quote Summary */}
+              <div className="bg-green-50 p-4 rounded-lg mb-6 border border-green-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                    {selectedItem.name?.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">{selectedItem.name}</p>
+                    <p className="text-sm text-gray-600">Quote ID: {selectedItem.quoteId}</p>
+                    <p className="text-sm text-gray-600">{selectedItem.fromCity} → {selectedItem.toCity}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Task Incharge Form */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-800 mb-4">👤 Task Incharge Details</h4>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={acceptQuoteData.taskIncharge.name}
+                      onChange={(e) =>
+                        setAcceptQuoteData({
+                          ...acceptQuoteData,
+                          taskIncharge: {
+                            ...acceptQuoteData.taskIncharge,
+                            name: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="Task incharge name"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Designation
+                    </label>
+                    <input
+                      type="text"
+                      value={acceptQuoteData.taskIncharge.designation}
+                      onChange={(e) =>
+                        setAcceptQuoteData({
+                          ...acceptQuoteData,
+                          taskIncharge: {
+                            ...acceptQuoteData.taskIncharge,
+                            designation: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="e.g., Logistics Manager"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number *
+                    </label>
+                    <input
+                      type="tel"
+                      value={acceptQuoteData.taskIncharge.phone}
+                      onChange={(e) =>
+                        setAcceptQuoteData({
+                          ...acceptQuoteData,
+                          taskIncharge: {
+                            ...acceptQuoteData.taskIncharge,
+                            phone: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="10-digit phone number"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={acceptQuoteData.taskIncharge.email}
+                      onChange={(e) =>
+                        setAcceptQuoteData({
+                          ...acceptQuoteData,
+                          taskIncharge: {
+                            ...acceptQuoteData.taskIncharge,
+                            email: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="email@example.com"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <button
+                    onClick={() => setShowAcceptModal(false)}
+                    className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (
+                        !acceptQuoteData.taskIncharge.name ||
+                        !acceptQuoteData.taskIncharge.phone ||
+                        !acceptQuoteData.taskIncharge.email
+                      ) {
+                        alert(
+                          "Please fill in all required fields (Name, Phone, Email)"
+                        );
+                        return;
+                      }
+
+                      setAcceptQuoteLoading(true);
+                      try {
+                        await updateQuoteStatus(
+                          selectedItem._id,
+                          "accepted",
+                          acceptQuoteData.taskIncharge
+                        );
+                        setShowAcceptModal(false);
+                        setSelectedItem({
+                          ...selectedItem,
+                          status: "accepted",
+                          taskIncharge: acceptQuoteData.taskIncharge,
+                        });
+                        alert("Quote accepted successfully!");
+                      } catch (err) {
+                        console.error("Failed to accept quote:", err);
+                        alert("Failed to accept quote");
+                      } finally {
+                        setAcceptQuoteLoading(false);
+                      }
+                    }}
+                    disabled={acceptQuoteLoading}
+                    className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {acceptQuoteLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <FiCheckCircle /> Accept & Assign
                       </>
                     )}
                   </button>

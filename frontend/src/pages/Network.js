@@ -10,6 +10,41 @@ import {
   FaClock,
 } from "react-icons/fa";
 
+// Add keyframe animation for blinking dots
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes blink-yellow {
+    0%, 100% { 
+      fill: #FFD700;
+      filter: drop-shadow(0 0 3px #FFD700);
+    }
+    50% { 
+      fill: #FFA500;
+      filter: drop-shadow(0 0 8px #FFA500);
+    }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% {
+      filter: drop-shadow(0 0 5px rgba(100, 150, 255, 0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 15px rgba(100, 150, 255, 0.8));
+    }
+  }
+  
+  .blink-dot {
+    animation: blink-yellow 1.5s infinite;
+  }
+  
+  .map-glow {
+    animation: pulse-glow 3s infinite;
+  }
+`;
+if (typeof document !== "undefined") {
+  document.head.appendChild(style);
+}
+
 const Network = () => {
   const [selectedRegion, setSelectedRegion] = useState("all");
 
@@ -242,142 +277,42 @@ const Network = () => {
           </div>
 
           <div className="relative bg-white rounded-2xl shadow-xl p-8 overflow-hidden">
-            {/* India Map with CSS positioned markers */}
-            <div className="relative w-full max-w-3xl mx-auto">
-              {/* India Map SVG - Proper India shape */}
-              <svg viewBox="0 0 400 500" className="w-full h-auto">
-                <defs>
-                  <linearGradient
-                    id="mapGradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#FFBF00" stopOpacity="0.85" />
-                    <stop
-                      offset="100%"
-                      stopColor="#FFA500"
-                      stopOpacity="0.65"
-                    />
-                  </linearGradient>
-                </defs>
-
-                {/* India Mainland */}
-                <path
-                  fill="url(#mapGradient)"
-                  stroke="#5E4F82"
-                  strokeWidth="2"
-                  d="M120,25 Q95,30 85,55 Q80,80 90,100 Q75,115 70,140 Q65,165 75,190 
-                     Q60,210 55,240 Q50,270 60,300 Q55,330 50,360 Q48,390 60,415 
-                     Q50,435 45,460 Q50,480 70,475 Q85,465 95,445 Q105,425 120,420 
-                     Q135,430 145,455 Q150,480 145,505 Q155,525 175,520 Q195,510 210,490 
-                     Q225,470 245,450 Q265,430 280,405 Q295,380 305,350 Q315,320 310,290 
-                     Q320,260 335,235 Q345,210 340,180 Q345,150 335,125 Q340,100 330,80 
-                     Q320,65 295,60 Q270,55 250,60 Q235,50 215,45 Q195,40 175,45 
-                     Q155,35 135,30 Q120,25 120,25 Z"
-                />
-
-                {/* Jammu & Kashmir */}
-                <path
-                  fill="url(#mapGradient)"
-                  stroke="#5E4F82"
-                  strokeWidth="2"
-                  d="M120,25 Q110,15 95,10 Q80,8 70,18 Q60,30 65,48 Q70,65 85,55 
-                     Q95,45 108,40 Q120,35 120,25 Z"
-                />
-
-                {/* Northeast India */}
-                <path
-                  fill="url(#mapGradient)"
-                  stroke="#5E4F82"
-                  strokeWidth="2"
-                  d="M330,80 Q350,70 370,75 Q388,85 392,105 Q390,125 375,135 
-                     Q358,142 340,138 Q328,130 330,110 Q332,90 330,80 Z"
-                />
-
-                {/* City Markers - Positioned for India geography */}
-                {[
-                  { x: 195, y: 85, city: "Delhi", hub: true },
-                  { x: 150, y: 115, city: "Jaipur", hub: false },
-                  { x: 245, y: 115, city: "Lucknow", hub: false },
-                  { x: 372, y: 105, city: "Guwahati", hub: false },
-                  { x: 95, y: 185, city: "Ahmedabad", hub: false },
-                  { x: 320, y: 205, city: "Kolkata", hub: true },
-                  { x: 82, y: 270, city: "Mumbai", hub: true },
-                  { x: 115, y: 310, city: "Pune", hub: false },
-                  { x: 195, y: 295, city: "Hyderabad", hub: false },
-                  { x: 235, y: 375, city: "Chennai", hub: false },
-                  { x: 175, y: 395, city: "Bangalore", hub: true },
-                  { x: 125, y: 455, city: "Kochi", hub: true },
-                ].map((loc, i) => (
-                  <g key={i}>
-                    {/* Outer glow */}
-                    <circle
-                      cx={loc.x}
-                      cy={loc.y}
-                      r={loc.hub ? 14 : 10}
-                      fill={loc.hub ? "#3B0A45" : "#5E4F82"}
-                      opacity="0.25"
-                    />
-                    {/* Main dot */}
-                    <circle
-                      cx={loc.x}
-                      cy={loc.y}
-                      r={loc.hub ? 8 : 5}
-                      fill={loc.hub ? "#3B0A45" : "#5E4F82"}
-                    />
-                    {/* Highlight */}
-                    <circle
-                      cx={loc.x - 2}
-                      cy={loc.y - 2}
-                      r={loc.hub ? 2.5 : 1.5}
-                      fill="white"
-                      opacity="0.5"
-                    />
-                    {/* Label */}
-                    <text
-                      x={
-                        loc.city === "Mumbai" ||
-                          loc.city === "Ahmedabad" ||
-                          loc.city === "Kochi" ||
-                          loc.city === "Pune"
-                          ? loc.x - 12
-                          : loc.city === "Kolkata" || loc.city === "Guwahati"
-                            ? loc.x + 12
-                            : loc.x
-                      }
-                      y={loc.y - 16}
-                      textAnchor={
-                        loc.city === "Mumbai" ||
-                          loc.city === "Ahmedabad" ||
-                          loc.city === "Kochi" ||
-                          loc.city === "Pune"
-                          ? "end"
-                          : loc.city === "Kolkata" || loc.city === "Guwahati"
-                            ? "start"
-                            : "middle"
-                      }
-                      fill="#FFBF00"
-                      fontSize="11"
-                      fontWeight="600"
-                    >
-                      {loc.city}
-                    </text>
-                  </g>
-                ))}
-              </svg>
+            {/* India Map Image */}
+            <div className="relative w-full max-w-4xl mx-auto">
+              {/* Map Image Container */}
+              <div
+                className="relative w-full rounded-lg overflow-hidden map-glow"
+                style={{
+                  backgroundImage: 'url(/Indianmap.png)',
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  aspectRatio: '1 / 1.2',
+                }}
+              >
+              </div>
             </div>
 
             {/* Legend */}
-            <div className="flex justify-center gap-8 mt-6">
+            <div className="flex justify-center gap-8 mt-8">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-primary"></div>
+                <div className="w-4 h-4 rounded-full bg-yellow-400" style={{
+                  animation: 'blink-yellow 1.5s infinite'
+                }}></div>
                 <span className="text-sm text-gray-600">Regional Hub</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-secondary"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-400" style={{
+                  animation: 'blink-yellow 1.5s infinite'
+                }}></div>
                 <span className="text-sm text-gray-600">Branch Office</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full" style={{
+                  background: 'linear-gradient(135deg, #E3F2FD, #BBDEFB)',
+                  border: '2px solid #1565C0'
+                }}></div>
+                <span className="text-sm text-gray-600">Service Area</span>
               </div>
             </div>
           </div>

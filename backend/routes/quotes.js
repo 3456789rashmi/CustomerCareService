@@ -8,12 +8,14 @@ const {
   getAllQuotes,
   getQuote,
   trackQuote,
+  getQuoteByQuoteId,
   updateQuote,
   getMyQuotes,
   deleteQuote,
   deleteUserQuote,
   getQuoteStats,
   claimQuotes,
+  submitPayment,
 } = require("../controllers/quoteController");
 
 // Validation rules
@@ -73,6 +75,9 @@ router.post("/claim", protect, claimQuotes);
 // @route   GET /api/quotes/my-quotes - Get user's quotes
 router.get("/my-quotes", protect, getMyQuotes);
 
+// @route   GET /api/quotes/details/:quoteId - Get full quote details by quoteId (User can view own, Admin can view all)
+router.get("/details/:quoteId", protect, getQuoteByQuoteId);
+
 // @route   GET /api/quotes/:id - Get single quote
 router.get("/:id", protect, getQuote);
 
@@ -88,6 +93,9 @@ router.get("/stats", protect, authorize("admin"), getQuoteStats);
 
 // @route   PUT /api/quotes/:id - Update quote
 router.put("/:id", protect, authorize("admin"), updateQuote);
+
+// @route   PUT /api/quotes/:id/payment - Submit payment for quote
+router.put("/:id/payment", protect, submitPayment);
 
 // @route   DELETE /api/quotes/:id - Delete quote
 router.delete("/:id", protect, authorize("admin"), deleteQuote);

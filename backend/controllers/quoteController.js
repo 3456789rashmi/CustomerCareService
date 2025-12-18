@@ -242,6 +242,47 @@ exports.trackQuote = async (req, res) => {
   }
 };
 
+// @desc    Get full quote details by quoteId (Admin)
+// @route   GET /api/quotes/details/:quoteId
+// @access  Private/Admin
+exports.getQuoteByQuoteId = async (req, res) => {
+  try {
+    const quote = await Quote.findOne({ quoteId: req.params.quoteId })
+      .populate("user", "firstName lastName email phone")
+      .populate("assignedTo", "firstName lastName email");
+
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        message: "Quote not found",
+      });
+    }
+
+    // Check authorization - user can only view their own quotes, admin can view all
+    if (
+      req.user.role !== "admin" &&
+      quote.user &&
+      quote.user._id.toString() !== req.user.id
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "User role '" + req.user.role + "' is not authorized to access this route",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: quote,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch quote",
+      error: error.message,
+    });
+  }
+};
+
 // @desc    Update quote status (Admin)
 // @route   PUT /api/quotes/:id
 // @access  Private/Admin
@@ -290,6 +331,34 @@ exports.updateQuote = async (req, res) => {
         });
       } catch (emailError) {
         console.log("Quote ready email could not be sent:", emailError.message);
+      }
+    }
+
+    // Send payment request email if status changed to accepted
+    if (status === "accepted" && finalCost) {
+      try {
+        const moveDate = new Date(quote.moveDate).toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const emailData = emailTemplates.paymentRequest({
+          name: quote.name,
+          quoteId: quote.quoteId,
+          finalCost,
+          fromCity: quote.fromCity,
+          toCity: quote.toCity,
+          moveDate,
+        });
+        await sendEmail({
+          to: quote.email,
+          subject: emailData.subject,
+          html: emailData.html,
+        });
+        console.log(`✅ Payment request email sent to ${quote.email} for quote ${quote.quoteId}`);
+      } catch (emailError) {
+        console.log("Payment request email could not be sent:", emailError.message);
       }
     }
 
@@ -514,6 +583,70 @@ exports.claimQuotes = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to claim quotes",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Submit payment for a quote
+// @route   PUT /api/quotes/:id/payment
+// @access  Private
+exports.submitPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentMethod, amount, paymentDetails } = req.body;
+
+    // Validate input
+    if (!paymentMethod || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment method and amount are required",
+      });
+    }
+
+    // Find quote
+    const quote = await Quote.findById(id);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        message: "Quote not found",
+      });
+    }
+
+    // Check if quote is accepted
+    if (quote.status !== "accepted") {
+      return res.status(400).json({
+        success: false,
+        message: "Payment can only be submitted for accepted quotes",
+      });
+    }
+
+    // Update quote with payment information
+    quote.paymentStatus = "completed";
+    quote.paymentDetails = {
+      method: paymentMethod,
+      transactionId: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      amount: amount,
+      paidAt: new Date(),
+      ...paymentDetails,
+    };
+
+    await quote.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Payment submitted successfully",
+      data: {
+        quoteId: quote.quoteId,
+        paymentStatus: quote.paymentStatus,
+        transactionId: quote.paymentDetails.transactionId,
+      },
+    });
+  } catch (error) {
+    console.error("Submit payment error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to submit payment",
       error: error.message,
     });
   }

@@ -16,7 +16,7 @@ import {
   FiUpload,
   FiTrash2,
   FiStar,
-  FiPhone,
+  FiArrowRight,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { userAPI, quoteAPI, enquiryAPI, feedbackAPI, getAvatarUrl } from "../services/api";
@@ -254,9 +254,10 @@ const Dashboard = () => {
     const colors = {
       pending: "bg-yellow-100 text-yellow-800",
       accepted: "bg-green-100 text-green-800",
-      completed: "bg-blue-100 text-blue-800",
+      completed: "bg-primary/20 text-primary",
       rejected: "bg-red-100 text-red-800",
-      cancelled: "bg-gray-100 text-gray-800",
+      cancelled: "bg-red-100 text-red-800",
+      reviewing: "bg-primary/20 text-primary",
       "in-progress": "bg-purple-100 text-purple-800",
       new: "bg-yellow-100 text-yellow-800",
     };
@@ -291,10 +292,12 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral">
+    <div className="min-h-screen bg-bgLight">
       {/* Dashboard Header */}
-      <div className="bg-gradient-to-r from-primary via-secondary to-primary py-8">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="bg-gradient-to-r from-navy via-navyLight to-navy py-8 relative overflow-hidden" style={{ backgroundImage: 'url(/userD.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-navy/80"></div>
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
@@ -318,10 +321,9 @@ const Dashboard = () => {
             <div className="mt-4 md:mt-0">
               <Link
                 to="/quote"
-                className="inline-flex items-center px-6 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-light transition-colors"
+                className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-sm transition-all duration-300 hover:bg-white/10"
               >
-                <FiPackage className="mr-2" />
-                Get New Quote
+                Get New Quote <FiArrowRight className="ml-2" />
               </Link>
             </div>
           </div>
@@ -340,7 +342,7 @@ const Dashboard = () => {
                     onClick={() => setActiveTab(item.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === item.id
                       ? "bg-primary text-white"
-                      : "text-gray-600 hover:bg-gray-100"
+                      : "text-navy hover:bg-bgLight"
                       }`}
                   >
                     <item.icon className="w-5 h-5" />
@@ -380,47 +382,72 @@ const Dashboard = () => {
                 className="space-y-6"
               >
                 {/* Stats Cards */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                <motion.div
+                  className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
+                >
+                  <motion.div
+                    className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-gray-500 text-sm">Total Quotes</p>
-                        <p className="text-3xl font-bold text-gray-800">
+                        <p className="text-3xl font-bold text-navy">
                           {dashboardData?.totalQuotes || 0}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <FiPackage className="text-blue-600 text-xl" />
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                        <FiPackage className="text-primary text-xl" />
                       </div>
                     </div>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                  </motion.div>
+                  <motion.div
+                    className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-gray-500 text-sm">Pending</p>
-                        <p className="text-3xl font-bold text-yellow-600">
+                        <p className="text-3xl font-bold text-primary">
                           {dashboardData?.pendingQuotes || 0}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <FiClock className="text-yellow-600 text-xl" />
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                        <FiClock className="text-primary text-xl" />
                       </div>
                     </div>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                  </motion.div>
+                  <motion.div
+                    className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-gray-500 text-sm">In Progress</p>
-                        <p className="text-3xl font-bold text-purple-600">
+                        <p className="text-3xl font-bold text-navy">
                           {dashboardData?.inProgressQuotes || 0}
                         </p>
                       </div>
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <FiTruck className="text-purple-600 text-xl" />
+                      <div className="w-12 h-12 bg-navy/20 rounded-full flex items-center justify-center">
+                        <FiTruck className="text-navy text-xl" />
                       </div>
                     </div>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl shadow-lg">
+                  </motion.div>
+                  <motion.div
+                    className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                  >
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-gray-500 text-sm">Completed</p>
@@ -432,30 +459,43 @@ const Dashboard = () => {
                         <FiCheckCircle className="text-green-600 text-xl" />
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* Recent Quotes */}
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                <motion.div
+                  className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.4 }}
+                >
+                  <h3 className="text-xl font-bold text-navy mb-4">
                     Recent Quotes
                   </h3>
                   {quotes.length > 0 ? (
-                    <div className="space-y-4">
-                      {quotes.slice(0, 5).map((quote) => (
-                        <div
+                    <motion.div
+                      className="space-y-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ staggerChildren: 0.05 }}
+                    >
+                      {quotes.slice(0, 5).map((quote, idx) => (
+                        <motion.div
                           key={quote._id}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05 }}
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-navy/5 to-primary/5 border border-navy/10 rounded-lg hover:bg-primary/10 hover:border-primary hover:shadow-lg transition-all duration-300 group"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                              <FiTruck className="text-primary" />
+                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                              <FiTruck className="text-white" />
                             </div>
                             <div>
-                              <p className="font-semibold text-gray-800">
+                              <p className="font-semibold text-navy group-hover:text-white transition-colors">
                                 {quote.quoteId}
                               </p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-600 group-hover:text-white/80 transition-colors">
                                 {quote.fromCity} → {quote.toCity}
                               </p>
                             </div>
@@ -468,13 +508,13 @@ const Dashboard = () => {
                             >
                               {quote.status.replace("_", " ").toUpperCase()}
                             </span>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-600 group-hover:text-white/80 transition-colors mt-1">
                               {formatDate(quote.createdAt)}
                             </p>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
-                    </div>
+                    </motion.div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <FiPackage className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -487,7 +527,7 @@ const Dashboard = () => {
                       </Link>
                     </div>
                   )}
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
@@ -496,9 +536,9 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-lg p-6"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all"
               >
-                <h3 className="text-xl font-bold text-gray-800 mb-6">
+                <h3 className="text-xl font-bold text-navy mb-6">
                   My Quotes
                 </h3>
 
@@ -561,19 +601,27 @@ const Dashboard = () => {
                 </div>
 
                 {filteredQuotes.length > 0 ? (
-                  <div className="space-y-4">
-                    {filteredQuotes.map((quote) => (
+                  <motion.div
+                    className="space-y-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ staggerChildren: 0.05 }}
+                  >
+                    {filteredQuotes.map((quote, idx) => (
                       <motion.div
                         key={quote._id}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-navy/5 to-primary/5 border border-navy/10 rounded-lg p-4 hover:bg-primary/10 hover:border-primary hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                        onClick={() => navigate(`/quote-tracking/${quote.quoteId}`)}
                       >
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                           <div
-                            className="flex-1 cursor-pointer"
-                            onClick={() => navigate(`/quote-tracking/${quote.quoteId}`)}
+                            className="flex-1"
                           >
                             <div className="flex items-center gap-2">
-                              <p className="font-bold text-gray-800">
+                              <p className="font-bold text-navy group-hover:text-white transition-colors">
                                 {quote.quoteId}
                               </p>
                               <span
@@ -584,7 +632,7 @@ const Dashboard = () => {
                                 {quote.status.replace("_", " ").toUpperCase()}
                               </span>
                             </div>
-                            <div className="mt-2 text-sm text-gray-600">
+                            <div className="mt-2 text-sm text-gray-600 group-hover:text-white/80 transition-colors">
                               <p className="flex items-center gap-2">
                                 <FiMapPin className="text-primary" />
                                 {quote.fromCity} → {quote.toCity}
@@ -614,7 +662,7 @@ const Dashboard = () => {
                         </div>
                       </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 ) : (
                   <div className="text-center py-12 text-gray-500">
                     <FiPackage className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -639,113 +687,111 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-lg p-6"
               >
-                <h3 className="text-xl font-bold text-gray-800 mb-6">
-                  My Enquiries
-                </h3>
-                {enquiries && enquiries.length > 0 ? (
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-gray-800">
+                      My Enquiries
+                    </h3>
+                  </div>
+
                   <div className="space-y-4">
-                    {enquiries.map((enquiry) => (
-                      <motion.div
-                        key={enquiry._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <p className="font-semibold text-gray-800">
-                              {enquiry.subject || "General Enquiry"}
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              Type: <span className="font-medium capitalize">{enquiry.enquiryType || "general"}</span>
-                            </p>
-                          </div>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${enquiry.status === "resolved"
-                              ? "bg-green-100 text-green-800"
-                              : enquiry.status === "in-progress"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-yellow-100 text-yellow-800"
-                              }`}
-                          >
-                            {enquiry.status?.charAt(0).toUpperCase() + enquiry.status?.slice(1) || "New"}
-                          </span>
-                        </div>
-
-                        <p className="text-gray-700 mb-3">
-                          {enquiry.message}
-                        </p>
-
-                        {/* Admin Response - Show when responded or resolved */}
-                        {(enquiry.status === "responded" || enquiry.status === "resolved") && enquiry.response && (
-                          <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded">
-                            <p className="text-sm font-semibold text-green-900 mb-2">✅ Response from UnitedPackers:</p>
-                            <p className="text-gray-700 text-sm mb-3">
-                              {enquiry.response}
-                            </p>
-                            <div className="bg-white p-3 rounded border border-green-200 mt-3">
-                              <p className="text-xs text-gray-600 mb-2 font-medium">If you're not satisfied or have further questions:</p>
-                              <a
-                                href="tel:+919876543210"
-                                className="text-sm font-semibold text-primary hover:text-secondary transition-colors flex items-center gap-2"
-                              >
-                                <FiPhone className="w-4 h-4" />
-                                Call us: +91 9876-543-210
-                              </a>
-                              <p className="text-xs text-gray-500 mt-2">Available Monday - Saturday, 9 AM - 6 PM IST</p>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-500 text-xs">Submitted</p>
-                            <p className="text-gray-800 font-medium">
-                              {enquiry.createdAt
-                                ? new Date(enquiry.createdAt).toLocaleDateString()
-                                : "N/A"}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs">Preferred Callback</p>
-                            <p className="text-gray-800 font-medium">
-                              {enquiry.callbackTime || "Any Time"}
-                            </p>
-                          </div>
-                          {enquiry.serviceInterested && (
-                            <div>
-                              <p className="text-gray-500 text-xs">Service Interest</p>
-                              <p className="text-gray-800 font-medium">
-                                {enquiry.serviceInterested}
+                    {enquiries && enquiries.length > 0 ? (
+                      enquiries.map((enquiry) => (
+                        <div
+                          key={enquiry._id}
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-blue-50 to-cyan-50"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-800">
+                                {enquiry.subject || "General Enquiry"}
                               </p>
-                            </div>
-                          )}
-                          {enquiry.expectedMoveDate && (
-                            <div>
-                              <p className="text-gray-500 text-xs">Expected Move</p>
-                              <p className="text-gray-800 font-medium">
-                                {new Date(enquiry.expectedMoveDate).toLocaleDateString()}
+                              <p className="text-sm text-gray-500 mt-1">
+                                Type: <span className="font-medium capitalize">{enquiry.enquiryType || "general"}</span>
                               </p>
+                              {enquiry.serviceInterested && (
+                                <p className="text-sm text-primary mt-1">
+                                  Service: {enquiry.serviceInterested}
+                                </p>
+                              )}
+                              <p className="text-gray-700 mt-2">
+                                {enquiry.message}
+                              </p>
+
+                              {/* Admin Response - Show when responded or resolved */}
+                              {(enquiry.status === "responded" || enquiry.status === "resolved") && enquiry.response && (
+                                <div className="mt-3 p-3 bg-white rounded border border-green-200">
+                                  <p className="text-sm font-semibold text-green-700 mb-2">✅ Response from UnitedPackers:</p>
+                                  <p className="text-gray-600 text-sm mb-2">
+                                    {enquiry.response}
+                                  </p>
+                                </div>
+                              )}
+
+                              <div className="flex flex-wrap gap-4 text-sm mt-3">
+                                <div>
+                                  <p className="text-gray-500 text-xs">Submitted</p>
+                                  <p className="text-gray-800 font-medium">
+                                    {enquiry.createdAt
+                                      ? new Date(enquiry.createdAt).toLocaleDateString("en-IN", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      })
+                                      : "N/A"}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500 text-xs">Preferred Callback</p>
+                                  <p className="text-gray-800 font-medium">
+                                    {enquiry.callbackTime || "Any Time"}
+                                  </p>
+                                </div>
+                                {enquiry.expectedMoveDate && (
+                                  <div>
+                                    <p className="text-gray-500 text-xs">Expected Move</p>
+                                    <p className="text-gray-800 font-medium">
+                                      {new Date(enquiry.expectedMoveDate).toLocaleDateString("en-IN", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      })}
+                                    </p>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-gray-500 text-xs">Status</p>
+                                  <span className={`text-xs font-semibold px-2 py-1 rounded ${enquiry.status === "responded"
+                                    ? "bg-green-100 text-green-800"
+                                    : enquiry.status === "resolved"
+                                      ? "bg-emerald-100 text-emerald-800"
+                                      : enquiry.status === "closed"
+                                        ? "bg-slate-100 text-slate-800"
+                                        : "bg-gray-100 text-gray-800"
+                                    }`}>
+                                    {enquiry.status?.charAt(0).toUpperCase() + enquiry.status?.slice(1) || "New"}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </motion.div>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="text-center py-12 text-gray-500">
+                        <FiFileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg">No enquiries yet</p>
+                        <Link
+                          to="/enquiry"
+                          className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors mt-4"
+                        >
+                          Submit an Enquiry
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <FiFileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">No enquiries yet</p>
-                    <Link
-                      to="/enquiry"
-                      className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors mt-4"
-                    >
-                      Submit an Enquiry
-                    </Link>
-                  </div>
-                )}
+                </div>
               </motion.div>
             )}
 
@@ -754,90 +800,69 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-lg p-6"
               >
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <FiStar className="text-yellow-500" />
-                  My Feedbacks
-                </h3>
-                {feedbacks && feedbacks.length > 0 ? (
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-gray-800">
+                      My Feedbacks
+                    </h3>
+                  </div>
+
                   <div className="space-y-4">
-                    {feedbacks.map((feedback) => {
-                      const quote = feedback.quoteId;
-                      return (
-                        <motion.div
+                    {feedbacks && feedbacks.length > 0 ? (
+                      feedbacks.map((feedback) => (
+                        <div
                           key={feedback._id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-amber-50 to-orange-50"
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="font-semibold text-gray-800">
-                                Quote #{quote?.quoteId || "N/A"}
-                              </p>
-                              <p className="text-sm text-gray-500 mt-1">
-                                {quote?.fromCity} → {quote?.toCity}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <div className="flex items-center gap-1 justify-end mb-2">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <FiStar
-                                    key={star}
-                                    className={`w-4 h-4 ${feedback.rating >= star
-                                      ? "fill-yellow-400 text-yellow-400"
-                                      : "text-gray-300"
-                                      }`}
-                                  />
-                                ))}
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="flex gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <FiStar
+                                      key={i}
+                                      size={16}
+                                      className={i < feedback.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-sm font-semibold text-gray-700">
+                                  {feedback.rating}/5
+                                </span>
                               </div>
-                              <p className="text-sm font-medium text-gray-700">
-                                {feedback.rating}/5
+                              {feedback.quoteId && (
+                                <p className="text-sm text-primary mt-1 font-medium">
+                                  Quote: {feedback.quoteId.quoteId} • {feedback.quoteId.fromCity} → {feedback.quoteId.toCity}
+                                </p>
+                              )}
+                              {feedback.comment && (
+                                <p className="text-gray-700 mt-2 italic">
+                                  "{feedback.comment}"
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-500 mt-2">
+                                {new Date(feedback.createdAt).toLocaleDateString("en-IN", {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit"
+                                })}
                               </p>
                             </div>
                           </div>
-
-                          {feedback.comment && (
-                            <p className="text-gray-700 mb-3 bg-gray-50 p-3 rounded-lg italic">
-                              "{feedback.comment}"
-                            </p>
-                          )}
-
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-gray-500 text-xs">Submitted</p>
-                              <p className="text-gray-800 font-medium">
-                                {new Date(feedback.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-gray-500 text-xs">Move Type</p>
-                              <p className="text-gray-800 font-medium capitalize">
-                                {quote?.moveType || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-gray-500 text-xs">Quote Status</p>
-                              <p className={`text-gray-800 font-medium capitalize px-2 py-1 rounded text-xs w-fit ${quote?.status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                                }`}>
-                                {quote?.status || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-12 text-gray-500">
+                        <FiStar className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <p className="text-lg">No feedbacks submitted yet</p>
+                        <p className="text-sm mt-2">Submit feedback for completed quotes to see them here</p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <FiStar className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">No feedbacks submitted yet</p>
-                    <p className="text-sm mt-2">Submit feedback for completed quotes to see them here</p>
-                  </div>
-                )}
+                </div>
               </motion.div>
             )}
 
@@ -846,9 +871,9 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-lg p-6"
+                className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all"
               >
-                <h3 className="text-xl font-bold text-gray-800 mb-6">
+                <h3 className="text-xl font-bold text-navy mb-6">
                   Profile Settings
                 </h3>
 
@@ -859,7 +884,7 @@ const Dashboard = () => {
                   </h4>
                   <div className="flex flex-col items-center gap-6">
                     {/* Avatar Display */}
-                    <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                    <div className="w-32 h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
                       {profileImage ? (
                         <img
                           src={profileImage}

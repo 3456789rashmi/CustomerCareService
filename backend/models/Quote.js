@@ -170,6 +170,20 @@ const quoteSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Payment Status Fields
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "initiated", "completed", "failed", ""],
+      default: "",
+    },
+    paymentDetails: {
+      method: String,
+      transactionId: String,
+      amount: Number,
+      paidAt: Date,
+      cardLast4: String,
+    },
+
     // Quote Processing
     quoteId: {
       type: String,
@@ -202,6 +216,32 @@ const quoteSchema = new mongoose.Schema(
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+
+    // Task Incharge Details (for accepted quotes)
+    taskIncharge: {
+      name: {
+        type: String,
+      },
+      phone: {
+        type: String,
+        match: [
+          /^(\+91|91)?[6-9][0-9]{9}$/,
+          "Please enter a valid Indian phone number",
+        ],
+      },
+      email: {
+        type: String,
+        lowercase: true,
+        trim: true,
+        match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"],
+      },
+      designation: {
+        type: String,
+      },
+      assignedDate: {
+        type: Date,
+      },
     },
 
     // User Reference (if logged in)

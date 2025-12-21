@@ -1,7 +1,7 @@
-import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-const UPLOAD_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:5000";
+import axios from "axios";
+import API_URL from "../config/api";
+const UPLOAD_URL = API_URL?.replace("/api", "");
 
 // Helper function to construct full avatar URL
 export const getAvatarUrl = (avatarPath) => {

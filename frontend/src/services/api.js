@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import API_URL from "../config/api";
 const UPLOAD_URL = API_URL?.replace("/api", "");

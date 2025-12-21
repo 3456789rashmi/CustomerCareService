@@ -6,7 +6,6 @@ import {
   FiCalendar,
   FiTruck,
   FiCheckCircle,
-  FiClock,
   FiAlertCircle,
   FiDollarSign,
   FiPhone,
@@ -15,10 +14,7 @@ import {
   FiHome,
   FiEdit,
   FiSave,
-  FiX,
-  FiDownload,
-  FiStar,
-  FiAward,
+  FiStar
 } from "react-icons/fi";
 import { quoteAPI, adminAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
@@ -43,6 +39,7 @@ const AdminQuoteDetail = () => {
     } else {
       fetchQuoteDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, navigate, quoteId]);
 
   const fetchQuoteDetails = async () => {
